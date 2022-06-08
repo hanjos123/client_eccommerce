@@ -1,0 +1,231 @@
+<div class="container-xxl flex-grow-1 container-p-y">
+    <form id="frm" action="/admin/news/edit/<%= news._id %>" method="post">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Bài viết/</span> Chỉnh sửa
+      </h4>
+
+      
+    <div class="row invoice-add">
+        <!-- Invoice Add-->
+        <div class="col-lg-9 col-12 mb-lg-0 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row p-sm-3 p-0">
+                        <div class="mb-3">
+                            <label class="form-label" for="title">Tiêu đề bài viết <span class="text-danger">(*)</span></label>
+                            <input name="title" value="<%= news.nTitle %>" type="text" class="form-control" id="title" placeholder="Nhập tiêu đề bài viết">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="basic-default-fullname">Nội dung bài viết<span class="text-danger">(*)</span></label>
+                            <div id="size-group" class="input-group">
+                                <textarea name="editor1" id="editor1" style="width: 100%">
+                                    <%= news.nBody %>
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Invoice Add-->
+
+        <!-- Invoice Actions -->
+        <div class="col-lg-3 col-12 invoice-actions">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row p-sm-3 p-0">
+                        
+                    </div>
+                    <p>Xuất bản<span class="text-danger">(*)</span></p>
+                    <select id="defaultSelect" name="status" class="mb-2 form-select">
+                        <option <% if(news.nStatus == true){ %> checked <% } %> value="true">Có</option>
+                        <option <% if(news.nStatus == false){ %> checked <% } %> value="false">Không</option>
+                    </select>
+                    <p class="mb-2">Danh mục sản phẩm <span class="text-danger">(*)</span></p>
+                    <% category.cateParent0.forEach(function(cate){ %>
+                        <% category.cateParentId.forEach(function(cate1){ %>
+                            <% if(cate.cUrl == 'news' && cate1.cParentId == cate._id && cate1.cUrl != ''){ %>
+                                <button type="button" onclick="addCategory('<%= cate1.cUrl %>','<%= cate1.cName %>')" class="btn btn-primary mb-1"><%= cate1.cName %></button>
+                            <% } %>
+                        <% }) %>
+                    <% }) %>
+                    <button id="btnAddCate" type="button" class="btn btn-primary mb-1" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                        Thêm Danh Mục Mới
+                    </button>
+                    <ul class="content">
+                        <% category.cateParentId.forEach(function(cate){ %>
+                            <% news.nCategory.forEach(function(cate1){ %>
+                                <% if(cate.cUrl == cate1){ %>
+                                    <li><%= cate.cName %>
+                                        <input name="cate[]" readonly="" style="display:none; width:10em ;cursor: none; background-color: #696cff; color: #fff; border: none;" type="text" value="<%=cate1 %>">
+                                        <i class="uit uit-multiply" onclick="removeTag(`<%= cate.cName %>`,this)">x</i>
+                                    </li>
+                                <% } %>
+                            <% }) %>
+                        <% }) %>
+                    </ul>
+
+                    <p class="mb-2">Ảnh đại diện bài viết <span class="text-danger">(*)</span></p>
+                    <button onclick="changeCheckBoxToRadio()" type="button" class="mb-12 col-sm-12 btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#imageLibrary">Chọn</button>
+                    <div class="row" id="avatarNews">
+                        <div class="row" id="avatarNews">
+                            <input name="avatar" type="text" value="<%= news.nAvatar %>" class="d-none">
+                            <img width="100%" src="<%= process.env.DOMAIN_SERVER %>/uploads/<%= news.nAvatar %>"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary d-grid w-100 mb-3">Lưu</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    </form>
+</div>
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content text-center">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div  class="modal-body onboarding-horizontal p-0">
+                <div class="onboarding-content mb-0">
+                    <h4 class="onboarding-title text-body">Thêm danh mục tin tức mới</h4>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label for="nameEx7" class="form-label">Tên Danh Mục</label>
+                                <input name="name" onkeyup="ChangeToSlug()" id="namecate" class="form-control" placeholder="Nhập Tên Danh Mục Muốn Thêm" type="text" value="" tabindex="0" id="nameEx7">
+                            </div>
+                            <div class="mb-3">
+                                <label for="nameEx7" class="form-label">Đường Dẫn Danh Mục</label>
+                                <input name="slug" id="slug" class="form-control" placeholder="Nhập Đường Dẫn Danh Mục Muốn Thêm" type="text" value="" tabindex="0" id="nameEx7">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button onclick="addCate()" type="button" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('imagelibrary', { allImage: allImage, imgSelected: news, type: 'radio'}) %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.ckeditor.com/4.19.0/standard/ckeditor.js"></script>
+<script src="http://localhost:3000/assets/vendor/libs/izitoast/iziToast.min.js"></script>
+<script>
+    CKEDITOR.replace('editor1', {
+        width: '100%',
+        height: '40em'
+    });
+    
+    function ChangeToSlug(){
+        var title, slug;
+    
+        //Lấy text từ thẻ input title 
+        title = document.getElementById("namecate").value;
+    
+        //Đổi chữ hoa thành chữ thường
+        slug = title.toLowerCase();
+    
+        //Đổi ký tự có dấu thành không dấu
+        slug = slug.replace(/á|à|ả|ạ|ã|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/gi, 'a');
+        slug = slug.replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/gi, 'e');
+        slug = slug.replace(/i|í|ì|ỉ|ĩ|ị/gi, 'i');
+        slug = slug.replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/gi, 'o');
+        slug = slug.replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/gi, 'u');
+        slug = slug.replace(/ý|ỳ|ỷ|ỹ|ỵ/gi, 'y');
+        slug = slug.replace(/đ/gi, 'd');
+        //Xóa các ký tự đặt biệt
+        slug = slug.replace(/\`|\~|\!|\@|\#|\||\$|\%|\^|\&|\*|\(|\)|\+|\=|\,|\.|\/|\?|\>|\<|\'|\"|\:|\;|_/gi, '');
+        //Đổi khoảng trắng thành ký tự gạch ngang
+        slug = slug.replace(/ /gi, "-");
+        //Đổi nhiều ký tự gạch ngang liên tiếp thành 1 ký tự gạch ngang
+        //Phòng trường hợp người nhập vào quá nhiều ký tự trắng
+        slug = slug.replace(/\-\-\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-/gi, '-');
+        //Xóa các ký tự gạch ngang ở đầu và cuối
+        slug = '@' + slug + '@';
+        slug = slug.replace(/\@\-|\-\@|\@/gi, '');
+        //In slug ra textbox có id “slug”
+        document.getElementById('slug').value = slug;
+    }
+
+    let cate = [];
+    function addCategory(slug ,name){
+        if(cate.indexOf(name) == -1){
+            $('.content').append('<li>'+name+'<input name="cate[]" readonly style="display:none; width:'+name.length+'em ;cursor: none; background-color: #696cff; color: #fff; border: none;" type="text" value="'+slug+'"><i class="uit uit-multiply" onclick="removeTag(`'+name+'`,this)">x</i></li>');
+            cate.push(name);
+        }
+    } 
+    function removeTag(name, ele){
+        let index = cate.indexOf(name);
+        cate.splice(index,1);
+        ele.parentElement.remove();
+    }
+
+    function addCate(){
+        JsLoadingOverlay.show(configs);
+        let name = $('#namecate').val();
+        let url = $('#slug').val();
+        $.ajax({
+        url: "/admin/category/createfromnews",
+        type: 'post',
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        data: {name: name, cUrl: url},
+        success: function(res) {
+            $('#namecate').val('');
+            $('#slug').val('');
+            $('#btnAddCate').before(`<button type="button" onclick="addCategory('${url}','${name}')" class="btn btn-primary mb-1">Thời trang</button>`);
+            $('#addCategoryModal').hide();
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+            $("body").removeAttr("style");
+            JsLoadingOverlay.hide();
+        }
+        });
+    }
+
+    $("#frm").submit(function(e) {
+
+        e.preventDefault(); 
+
+        var form = $(this);
+        var actionUrl = form.attr('action');
+
+        $.ajax({
+            type: "POST",
+            url: actionUrl,
+            data: form.serialize(),
+            dataType: 'json',
+            success: function(data)
+            {
+                if(data.status == 'success'){
+                    iziToast.success({
+                        message: data.info,
+                        position: 'topCenter'
+                    });
+                    setTimeout(function(){
+                        window.location.href = '<%= process.env.DOMAIN_NAME %>/admin/news';
+                    }, 3000);
+                } else {
+                    iziToast.error({
+                        message: data.info,
+                        position: 'topCenter'
+                    })
+                }
+            }
+        });
+
+    });
+</script>

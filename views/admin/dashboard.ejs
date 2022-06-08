@@ -1,0 +1,455 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="/assets/css/flatpickr.css">
+<link rel="stylesheet" href="/assets/css/app-calendar.css">
+<link rel="stylesheet" href="/assets/vendor/libs/apex-charts/apex-charts.css">
+<div class="content-wrapper">
+    <% function readmore(text){ var count=20; return text.slice(0, count) + (text.length> count ? "..." : "");
+        }
+        function timeSince(date) {
+
+        var seconds = Math.floor((new Date() - date) / 1000);
+        var interval = seconds / 31536000;
+        if (interval > 1) {
+        return Math.floor(interval) + " năm trước";
+        }
+        interval = seconds / 2592000;
+        if (interval > 1) {
+        return Math.floor(interval) + " tháng trước";
+        }
+        interval = seconds / 86400;
+        if (interval > 1) {
+        return Math.floor(interval) + " ngày trước";
+        }
+        interval = seconds / 3600;
+        if (interval > 1) {
+        return Math.floor(interval) + " giờ trước";
+        }
+        interval = seconds / 60;
+        if (interval > 1) {
+        return Math.floor(interval) + " phút trước";
+        }
+        return Math.floor(seconds) + " giây trước";
+        }
+        var aDay = 24*60*60*1000;
+        %>
+        <!-- Content -->
+
+        <div class="container-xxl flex-grow-1 container-p-y">
+            <h4 class="fw-bold py-3 mb-4">Dashboard</h4>
+
+            <div class="row">
+                <div class="col-md-6 col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <h5 class="card-title m-0 me-2">Khách hàng phản ánh</h5>
+                            <div class="dropdown">
+                                <button class="btn p-0" type="button" id="employeeList" data-bs-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                    <i class="bx bx-dots-vertical-rounded"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="employeeList">
+                                    <a class="dropdown-item" href="/admin/contact">Xem tất cả</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <ul class="p-0 m-0">
+                                <% contact.forEach(function(contact){ %>
+                                    <li class="d-flex mb-4 pb-1">
+                                        <div class="d-flex w-100 align-items-start gap-2" style="position: relative;">
+                                            <div class="d-flex justify-content-between flex-grow-1 flex-wrap">
+                                                <div>
+                                                    <h6 class="mb-2">
+                                                        <%= contact.Name %>
+                                                    </h6>
+                                                </div>
+
+                                                <div class="user-progress d-flex align-items-center gap-2">
+                                                    <h6 class="mb-0">
+                                                        <%= readmore(contact.Detail) %>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <% }) %>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <h5 class="card-title m-0 me-2">Đơn hàng mới</h5>
+                            <div class="dropdown">
+                                <button class="btn p-0" type="button" id="transactionID" data-bs-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                    <i class="bx bx-dots-vertical-rounded"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">
+                                    <a class="dropdown-item" href="/admin/order">Xem tất cả</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <ul class="p-0 m-0">
+                                <% order.forEach(order=>{ %>
+                                    <% if(order.PaymentMethod=='Tiền mặt' ){ %>
+                                        <li class="d-flex mb-4 pb-1">
+                                            <div class="avatar flex-shrink-0 me-3">
+                                                <a href="/admin/order/edit/<%= order._id %>">
+                                                    <img src="../../assets/img/icons/unicons/wallet.png" alt="User"
+                                                        class="rounded">
+                                                </a>
+                                            </div>
+                                            <div
+                                                class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                <div class="me-2">
+                                                    <h6 class="mb-0">
+                                                        <%= order.PaymentMethod %>
+                                                    </h6>
+                                                </div>
+                                                <div class="user-progress d-flex align-items-center gap-1">
+                                                    <h6 class="mb-0">
+                                                        <%= timeSince(new Date(order.createdAt)) %>
+                                                    </h6> <span class="text-muted"></span>
+                                                </div>
+                                                <div class="user-progress d-flex align-items-center gap-1">
+                                                    <h6 class="mb-0">
+                                                        <%= Intl.NumberFormat().format(order.Total) %>
+                                                    </h6> <span class="text-muted">đ</span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <% } else { %>
+                                            <li class="d-flex mb-4 pb-1">
+                                                <div class="avatar flex-shrink-0 me-3">
+                                                    <a href="/admin/order/edit/<%= order._id %>">
+                                                        <img src="../../assets/img/icons/unicons/cc-success.png"
+                                                            alt="User" class="rounded">
+                                                    </a>
+                                                </div>
+                                                <div
+                                                    class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                    <div class="me-2">
+                                                        <h6 class="mb-0">
+                                                            <%= order.PaymentMethod %>
+                                                        </h6>
+                                                    </div>
+                                                    <div class="user-progress d-flex align-items-center gap-1">
+                                                        <h6 class="mb-0">
+                                                            <%= timeSince(new Date(order.createdAt)) %>
+                                                        </h6> <span class="text-muted"></span>
+                                                    </div>
+                                                    <div class="user-progress d-flex align-items-center gap-1">
+                                                        <h6 class="mb-0">
+                                                            <%= Intl.NumberFormat().format(order.Total) %>
+                                                        </h6> <span class="text-muted">đ</span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <% } %>
+                                                <% }) %>
+
+
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Icon container -->
+            <div class="d-flex flex-wrap" id="slider-container">
+                <% slider.forEach(function(sli){ %>
+                    <div class="card icon-card cursor-pointer text-center mb-4 mx-2">
+                        <div class="position-relative card-body">
+                            <img style="height: 200px; width: 200px;"
+                                src="<%= process.env.DOMAIN_SERVER %>/uploads/<%=sli.iFileName%>">
+                            <button type="button" onclick="deleteSlider('<%=sli._id%>')"
+                                class="position-absolute top-0 end-0 btn-close" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <% }) %>
+                        <div class="card icon-card cursor-pointer text-center mb-4 mx-2">
+                            <div class="position-relative card-body ">
+
+                                <form id="frm" enctype="multipart/form-data"
+                                    style="height: 200px; width: 200px; text-align: center;"
+                                    action="<%= process.env.DOMAIN_API %>/uploadslide" method="post">
+
+                                    <label for="uploadImage" class="preview">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>Upload to preview image</span>
+                                    </label>
+                                    <input hidden onchange="uploadSlide()" id="uploadImage" name="image" type="file">
+
+                                </form>
+                            </div>
+                        </div>
+
+            </div>
+
+            <div class="card app-calendar-wrapper">
+                <div class="row g-0">
+                    <!-- Calendar Sidebar -->
+                    <div class="col app-calendar-sidebar" id="app-calendar-sidebar">
+                        <div class="border-bottom p-4 my-sm-0 mb-3">
+                            <div class="d-grid">
+                                <button onclick="qget()" class="form-control btn btn-primary btn-toggle-sidebar">
+                                    <i class="fa-solid fa-file-excel"></i>
+                                    <span class="align-middle">Xuất file excel</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="ms-n2">
+                                <div class="inline-calendar flatpickr-input" readonly="readonly"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col app-calendar-content">
+                        <div class="card shadow-none border-0">
+                            <div class="card-body pb-0">
+                                <div id="chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+</div>
+
+<script src="/assets/vendor/libs/apex-charts/apexcharts.js"></script>
+<script src="/assets/vendor/libs/jquery/jquery.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    var from;
+    var to;
+    $(document).ready(() => {
+        R = document.querySelector(".inline-calendar");
+        R.flatpickr({
+            monthSelectorType: "static",
+            inline: !0,
+            maxDate: "today",
+            mode: "range",
+            onChange: function (selectedDates, dateStr, instance) {
+                if (selectedDates.length == 2) {
+                    from = selectedDates[0].getFullYear() + "-" + numeroAdosCaracteres(selectedDates[0].getMonth() + 1) + "-" + numeroAdosCaracteres(selectedDates[0].getDate());
+                    to = selectedDates[1].getFullYear() + "-" + numeroAdosCaracteres(selectedDates[1].getMonth() + 1) + "-" + numeroAdosCaracteres(selectedDates[1].getDate());
+                    getData(from, to);
+                }
+            },
+        });
+    })
+    function numeroAdosCaracteres(fecha) {
+        if (fecha > 9) {
+            return "" + fecha;
+        } else {
+            return "0" + fecha;
+        }
+    }
+
+    function getData(from, to) {
+        $.ajax({
+            url: "<%= process.env.DOMAIN_API %>/totalorder",
+            type: 'post',
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "json",
+            data: { dateStart: from, dateEnd: to },
+            success: function (res) {
+                res.sort((a, b) => (a._id > b._id) ? 1 : -1)
+                console.log(res);
+                let data = [];
+                let label = [];
+                for (i = 0; i < res.length; i++) {
+                    data.push(res[i].Total);
+                    label.push(res[i]._id);
+                }
+                setChart(data, label);
+            }
+        });
+    }
+
+    function convert(str) {
+        var date = new Date(str), mnth = ("0" + (date.getMonth() + 1)).slice(-2), day = ("0" + date.getDate()).slice(-2);
+        return [day, mnth, date.getFullYear()].join("/");
+    }
+    function setChart(data, label) {
+        label.forEach((x, i) => {
+            label[i] = 'Ngày ' + convert(x);
+        }
+        );
+        var options = {
+            chart: {
+                height: 400,
+                type: 'line',
+                parentHeightOffset: 0,
+                zoom: {
+                    enabled: !1
+                },
+                toolbar: {
+                    show: !1
+                }
+            },
+            dataLabels: {
+                style: {
+                    colors: ['#FFF']
+                }
+            },
+            fill: {
+                colors: ['#fff']
+            },
+            series: [{
+                name: 'Doanh thu',
+                data: data
+            }],
+            grid: {
+                borderColor: '#7c7db6',
+                xaxis: {
+                    lines: {
+                        show: !0
+                    }
+                },
+                padding: {
+                    top: -20
+                }
+            },
+            xaxis: {
+                categories: label,
+                axisBorder: {
+                    show: !1
+                },
+                axisTicks: {
+                    show: !1
+                },
+                labels: {
+                    style: {
+                        colors: '#7c7db6',
+                        fontSize: "13px"
+                    }
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        colors: '#7c7db6',
+                        fontSize: "13px"
+                    }
+                }
+            },
+            markers: {
+                strokeWidth: 7,
+                strokeOpacity: 1,
+                strokeColors: ['#fff'],
+                colors: ['#ffab00']
+            },
+            colors: ['#ffab00']
+        }
+
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+
+        chart.render();
+        chart.update();
+    }
+
+    function uploadSlide() {
+        JsLoadingOverlay.show(configs);
+        var formData = new FormData();
+        var attachment_data = $('#frm').find('input')[0].files[0];
+        formData.append('image', attachment_data);
+        $.ajax({
+            async: true,
+            type: 'POST',
+            url: '<%= process.env.DOMAIN_API %>/uploadslide',
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: 'json',
+            data: formData,
+            contentType: false,
+            processData: false,
+            headers: {
+                'X-CSRF-Token': $("meta[name='csrf-token']").attr('content')
+            },
+            success: function (res) {
+                console.log(res);
+                $('#image').val('');
+                updateListSlider(res.info);
+                JsLoadingOverlay.hide();
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+    function updateListSlider(res) {
+        let html = `<div class="d-flex flex-wrap" id="slider-container">`;
+        res.forEach(function (sli) {
+            html +=
+                `<div class="card icon-card cursor-pointer text-center mb-4 mx-2">
+                    <div class="position-relative card-body">
+                        <img style="height: 200px; width: 200px;"
+                            src="<%= process.env.DOMAIN_SERVER %>/uploads/` +
+                sli.iFileName +
+                `">
+                        <button type="button" onclick="deleteSlider('` +
+                sli._id +
+                `')"
+                            class="position-absolute top-0 end-0 btn-close" aria-label="Close"></button>
+                    </div>
+                </div>`;
+        });
+        html += `<div class="card icon-card cursor-pointer text-center mb-4 mx-2">
+                        <div class="position-relative card-body ">
+
+                        <form id="frm" enctype="multipart/form-data"
+                        style="height: 200px; width: 200px; text-align: center;"
+                        action="<%= process.env.DOMAIN_API %>/uploadslide" method="post">
+
+                        <label for="uploadImage" class="preview">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Upload to preview image</span>
+                                </label>
+                                <input hidden onchange="uploadSlide()" id="uploadImage" name="image" type="file">
+
+                    </form>
+                        </div>
+                    </div>
+
+        </div>`;
+        $('#slider-container').replaceWith(html);
+    }
+
+    function qget() {
+        if(!from || !to){
+            Swal.fire({
+                title: "Oops...",
+                text: 'Bạn chưa chọn ngày xuất file',
+                icon: "error",
+                timer: 1000
+            });
+        } else { 
+            $.ajax({
+                type: "POST",
+                url: '/exportdata',
+                data: { dateStart: from, dateEnd: to },
+                dataType: 'html',
+                success: function (data) {
+                    console.log(data);
+                    if(data == 'Không có dữ liệu'){
+                        Swal.fire({
+                            title: "Oops...",
+                            text: 'Không có dữ liệu',
+                            icon: "error",
+                            timer: 1000
+                        });
+                    } else 
+                    window.open('<%= process.env.DOMAIN_NAME %>/export/' + data, '_blank');
+                }
+            });
+        }
+    }
+</script>

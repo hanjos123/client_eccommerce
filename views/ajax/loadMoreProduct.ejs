@@ -1,0 +1,24 @@
+<% products.forEach(function(product){ %>
+    <div class="col-md-4 animated zoomIn">
+        <div class="product-item animated zoomIn">
+            <div class="product-thumb">
+                <% if(product.Sale == 1){ %>
+                    <span class="bage">Sale</span>
+                <% } %>
+                <img class="img-responsive" src="<%= product.Product_avatar %>" alt="product-img" />
+                <div class="preview-meta">
+                    <ul>
+                        <li>
+                            <a href="javascript:(0)" onclick="addToCart('<%= product.Product_slug %>')">Thêm Vào Giỏ Hàng</a>
+                        </li>
+                    </ul>
+                  </div>
+            </div>
+            <div class="product-content">
+                <h4><a href="/products/<%= product.Product_slug %>"><%= product.Product_name %></a></h4>
+                <p class="price"><%= Intl.NumberFormat().format(product.Price) %>₫</p>
+            </div>
+        </div>
+    </div>
+    
+<% }) %>

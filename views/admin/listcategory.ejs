@@ -1,0 +1,435 @@
+<div class="content-wrapper">
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4">
+            <span class="text-muted fw-light">Danh Mục /</span> Danh Sách
+        </h4>
+        <div class="card">
+            <div class="card-datatable table-responsive">
+                <div id="DataTables_Product_wrapper" class="dataTables_wrapper dt-bootstrap5">
+                    <div class="row ms-2 me-3">
+                        <div
+                            class="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-2">
+                            <div
+                                class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start mt-md-0 mt-3">
+                                <div class="dt-buttons">
+                                    <button type="button" class="create-new btn btn-primary" data-bs-toggle="offcanvas"
+                                        data-bs-target="#offcanvasAddCate">
+                                        <i class="bx bx-plus me-sm-2"></i>Thêm Danh Mục Mới
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-2">
+                            <div class="dataTables_filter">
+                                <input onkeyup="findCate(this)" type="search" class="form-control"
+                                    placeholder="Tìm kiếm...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="datatables-basic table border-top dataTable no-footer dtr-column" id="listcategory"
+                role="grid" aria-describedby="DataTables_Product_info" style="width: 1209px;">
+                <thead>
+                    <tr role="row">
+                        <th style="width: 35%">Tên danh mục</th>
+                        <th style="width: 30%;">Đường dẫn</th>
+                        <th style="width: 20%;">Vị Trí</th>
+                        <th style="width: 5%;">Hiển Thị</th>
+                        <th style="width: 10%;">Chức năng</th>
+                    </tr>
+                </thead>
+                <tbody id="list">
+                    <% let i=0; let
+                        arrColor=['table-primary','table-danger','table-warning','table-secondary','table-success','table-info'];
+                        category.cateParent0.forEach(function(cate, i){ %>
+                        <tr class="<%=arrColor[i%arrColor.length]%> alone" id="<%= cate._id %>">
+                            <td>
+                                <%= cate.cName %>
+                            </td>
+                            <td>
+                                /<%= cate.cUrl %>
+                            </td>
+                            <td class="position">
+                                <button type="button" <% if(i==0){ %>disabled<% } %> onclick="changePosition('<%=
+                                            cate._id %>','up')"
+                                            class="btn-List"><i class="bx bx-chevron-up"></i></button>
+                                <button type="button" <% if(i==category.cateParent0.length-1){ %> disabled <% }%>
+                                        onclick="changePosition('<%= cate._id %>','down')" class="btn-List"><i
+                                                class="bx bx-chevron-down"></i></button>
+                            </td>
+                            <td>
+                                <div class="col-3 text-end">
+                                    <label class="switch me-0">
+                                        <input onclick="status('<%= cate._id %>',this)" type="checkbox"
+                                            class="switch-input" <% if(cate.Status){ %> checked <% } %>>
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on">
+                                                    <i class="bx bx-check"></i>
+                                                </span>
+                                                <span class="switch-off">
+                                                    <i class="bx bx-x"></i>
+                                                </span>
+                                            </span>
+                                            <span class="switch-label"></span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <% if(cate.cAlone==false){ %>
+                                        <a href="javascript:(0);" onclick="showParentMenu('<%=cate._id%>')"
+                                            class="btn-List text-body">
+                                            <i class="bx bx-show mx-1"></i>
+                                        </a>
+                                        <% } %>
+                                            <div class="dropdown">
+                                                <a href="javascript:;"
+                                                    class="btn dropdown-toggle hide-arrow text-body p-0"
+                                                    data-bs-toggle="dropdown"><i
+                                                        class="bx bx-dots-vertical-rounded"></i></a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <button onclick="setValueEdit('<%= cate._id %>')"
+                                                        class="dropdown-item" type="button" data-bs-toggle="offcanvas"
+                                                        data-bs-target="#offcanvasRight"
+                                                        aria-controls="offcanvasRight">Chỉnh sửa</button>
+                                                    <button onclick="deletecate(`<%=cate._id%>`)"
+                                                        class="dropdown-item delete-record text-danger">Xóa</button>
+                                                </div>
+                                            </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <% let cateParent=[]; category.cateParentId.forEach(function(cate1, index){
+                            if(cate1.cParentId==cate._id){ cateParent.push(cate1._id) } }) %>
+                            <% category.cateParentId.forEach(function(cate1, index){ %>
+                                <% if(cate1.cParentId==cate._id){ %>
+                                    <tr
+                                        class="listCategories list<%=cate._id%> <%=arrColor[i%arrColor.length]%> fade show">
+                                        <td>
+                                            --- <%= cate1.cName %>
+                                        </td>
+                                        <td>
+                                            /<%= cate.cUrl %>/<%= cate1.cUrl %>
+                                        </td>
+                                        <td class="position">
+                                            <% let lastElement=cateParent[cateParent.length - 1]; %>
+                                                <button type="button" <% if(cateParent[0]==cate1._id){ %>disabled<% } %>
+                                                        onclick="changePosition('<%= cate1._id %>','up')"
+                                                            class="btn-List"><i class="bx bx-chevron-up"></i></button>
+                                                <button type="button" <% if(lastElement==cate1._id){ %>disabled<% } %>
+                                                        onclick="changePosition('<%= cate1._id %>','down')"
+                                                            class="btn-List"><i class="bx bx-chevron-down"></i></button>
+                                        </td>
+                                        <td>
+                                            <div class="col-3 text-end">
+                                                <label class="switch me-0">
+                                                    <input onclick="status('<%= cate1._id %>',this)" type="checkbox"
+                                                        class="switch-input" <% if(cate1.Status){ %> checked <% } %>>
+                                                        <span class="switch-toggle-slider">
+                                                            <span class="switch-on">
+                                                                <i class="bx bx-check"></i>
+                                                            </span>
+                                                            <span class="switch-off">
+                                                                <i class="bx bx-x"></i>
+                                                            </span>
+                                                        </span>
+                                                        <span class="switch-label"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex align-items-center">
+                                                <div class="dropdown">
+                                                    <a href="javascript:;"
+                                                        class="btn dropdown-toggle hide-arrow text-body p-0"
+                                                        data-bs-toggle="dropdown"><i
+                                                            class="bx bx-dots-vertical-rounded"></i></a>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <button onclick="setValueEdit('<%= cate1._id %>')"
+                                                            class="dropdown-item" type="button"
+                                                            data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight"
+                                                            aria-controls="offcanvasRight">Chỉnh sửa</button>
+                                                        <button onclick="deletecate(`<%=cate1._id%>`)"
+                                                            class="dropdown-item delete-record text-danger">Xóa</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                                        <% }) %>
+                                            <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddCate" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasRightLabel">Thêm Danh Mục</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="nameEx7" class="form-label">Tên Danh
+                        Mục</label>
+                    <input name="name" onkeyup="ChangeToSlug()" id="namecate" class="form-control"
+                        placeholder="Nhập Tên Danh Mục Muốn Thêm" type="text" value="" tabindex="0" id="nameEx7">
+                </div>
+                <div class="mb-3">
+                    <label for="nameEx7" class="form-label">Slug</label>
+                    <input name="name" id="slug" class="form-control" placeholder="Nhập Tên Danh Mục Muốn Thêm"
+                        type="text" value="" tabindex="0" id="nameEx7">
+                </div>
+                <div class="mb-3">
+                    <label for="nameEx7" class="form-label">Thuộc Danh
+                        Mục</label>
+                    <select id="cateparent" class="form-control" name="cate_parent">
+                        <option value="0">--Danh Mục Cha--</option>
+                        <% category.cateParent0.forEach(function(cate){ %>
+                            <option value="<%=cate._id%>">
+                                <%=cate.cName%>
+                            </option>
+                            <% }) %>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Đóng</button>
+        <button onclick="addCategory()" type="button" data-bs-dismiss="offcanvas" class="btn btn-primary">Thêm</button>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasRightLabel">Chỉnh Sửa Danh Mục</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="mb-3">
+                    <label for="nameEx7" class="form-label">Tên Danh
+                        Mục</label>
+                    <input name="name" onkeyup="ChangeToSlug()" id="editName" class="form-control"
+                        placeholder="Nhập Tên Danh Mục Muốn Thêm" type="text" value="" tabindex="0" id="nameEx7">
+                </div>
+                <div class="mb-3">
+                    <label for="nameEx7" class="form-label">Slug</label>
+                    <input name="name" id="editSlug" class="form-control" placeholder="Nhập Tên Danh Mục Muốn Thêm"
+                        type="text" value="" tabindex="0" id="nameEx7">
+                </div>
+                <div class="mb-3">
+                    <label for="nameEx7" class="form-label">Thuộc Danh
+                        Mục</label>
+                    <select id="editCate" class="form-control" name="cate_parent">
+                        <option value="0">--Danh Mục Cha--</option>
+                        <% category.cateParent0.forEach(function(cate){ %>
+                            <option value="<%=cate._id%>">
+                                <%=cate.cName%>
+                            </option>
+                            <% }) %>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Đóng</button>
+        <button id="buttonEdit" onclick="editCate()" type="button" data-bs-dismiss="offcanvas"
+            class="btn btn-primary">Sửa</button>
+    </div>
+</div>
+
+<script src="/assets/vendor/libs/sweetalert2/sweetalert2.js"></script>
+<script src="/assets/vendor/libs/jquery/jquery.js"></script>
+<script>
+
+    var el = document.getElementById('list');
+    var sortable = new Sortable(el, {
+        onSort: function(evt) {
+            $('#list .alone').each(function(index){
+                $(this).attr('data-position', index);
+            })
+        }
+    })
+
+    function status(id) {
+        $.ajax({
+            async: true,
+            type: "GET",
+            url: "<%= process.env.DOMAIN_SERVER %>/v1/api/changestatuscategory/" + id,
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "json",
+            data: { id },
+            success: function (res) {
+                console.log(res);
+                if (res.status == 'failed') {
+                    Swal.fire({
+                        title: "Oops...",
+                        text: "Xảy ra lỗi",
+                        icon: "error",
+                    });
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000)
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            },
+        })
+    }
+
+    function ChangeToSlug() {
+        var title, slug;
+        title = document.getElementById("namecate").value;
+        slug = title.toLowerCase();
+        slug = slug.replace(/á|à|ả|ạ|ã|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/gi, 'a');
+        slug = slug.replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/gi, 'e');
+        slug = slug.replace(/i|í|ì|ỉ|ĩ|ị/gi, 'i');
+        slug = slug.replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/gi, 'o');
+        slug = slug.replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/gi, 'u');
+        slug = slug.replace(/ý|ỳ|ỷ|ỹ|ỵ/gi, 'y');
+        slug = slug.replace(/đ/gi, 'd');
+        //Xóa các ký tự đặt biệt
+        slug = slug.replace(/\`|\~|\!|\@|\#|\||\$|\%|\^|\&|\*|\(|\)|\+|\=|\,|\.|\/|\?|\>|\<|\'|\"|\:|\;|_/gi, '');
+        //Đổi khoảng trắng thành ký tự gạch ngang
+        slug = slug.replace(/ /gi, "-");
+        //Đổi nhiều ký tự gạch ngang liên tiếp thành 1 ký tự gạch ngang
+        //Phòng trường hợp người nhập vào quá nhiều ký tự trắng
+        slug = slug.replace(/\-\-\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-/gi, '-');
+        //Xóa các ký tự gạch ngang ở đầu và cuối
+        slug = '@' + slug + '@';
+        slug = slug.replace(/\@\-|\-\@|\@/gi, '');
+        //In slug ra textbox có id “slug”
+        document.getElementById('slug').value = slug;
+    }
+
+    function addCategory() {
+        JsLoadingOverlay.show(configs);
+        let name = $('#namecate').val();
+        let slug = $('#slug').val();
+        let cate = $('#cateparent').val();
+        $.ajax({
+            url: "/admin/category/create",
+            type: 'post',
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "html",
+            data: { name: name, slug: slug, cate_parent: cate },
+            success: function (res) {
+                $('#listcategory').replaceWith(res);
+                $('#addCategoryModal').hide();
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+                $("body").removeAttr("style");
+                JsLoadingOverlay.hide();
+            },
+            error: function (xhr) {
+                // alert(id);
+                console.log(xhr.responseText);
+            },
+        });
+    }
+
+    function deletecate(id) {
+        JsLoadingOverlay.show(configs);
+        $.ajax({
+            async: true,
+            url: "/admin/category/delete",
+            type: 'post',
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "html",
+            data: { id: id },
+            success: function (res) {
+                $('#listcategory').replaceWith(res);
+                JsLoadingOverlay.hide();
+            },
+            error: function (xhr) {
+                // alert(id);
+                console.log(xhr.responseText);
+            },
+        });
+    }
+
+    function editCate(id) {
+        let title = $('#editName').val();
+        let slug = $('#editSlug').val();
+        let parent = $('#editCate').val();
+        $.ajax({
+            async: true,
+            url: "/admin/category/edit/" + id,
+            type: 'post',
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "html",
+            data: { title, slug, parent },
+            success: function (res) {
+                console.log(res);
+                $('#listcategory').replaceWith(res);
+                $('.modal-backdrop').remove();
+            },
+            error: function (xhr) {
+                // alert(id);
+                console.log(xhr.responseText);
+            },
+        });
+    }
+
+    function showParentMenu(id) {
+        $('.list' + id).toggleClass('hidden');
+    }
+
+    function changePosition(id, method) {
+        JsLoadingOverlay.show(configs);
+        $.ajax({
+            async: true,
+            url: "/admin/category/changeposition",
+            type: 'post',
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "html",
+            data: { id, method },
+            success: function (res) {
+                $('#listcategory').replaceWith(res);
+                JsLoadingOverlay.hide();
+            },
+            error: function (xhr) {
+                // alert(id);
+                console.log(xhr.responseText);
+            },
+        });
+    }
+
+    function setValueEdit(id) {
+        $.ajax({
+            async: true,
+            url: "<%= process.env.DOMAIN_API %>/getonecategory",
+            type: 'post',
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "json",
+            data: { id },
+            success: function (res) {
+                $('#editName').val(res.cName);
+                $('#editSlug').val(res.cUrl);
+                $('#editCate').val(res.cParentId).change();
+                $("#buttonEdit").attr("onclick", "editCate('" + id + "')");
+            },
+            error: function (xhr) {
+                // alert(id);
+                console.log(xhr.responseText);
+            },
+        });
+    }
+
+    function findCate(ele) {
+        var str = $(ele).val();
+        $('#list tr').filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(str.toLowerCase()) > -1);
+        })
+    }
+</script>

@@ -1,0 +1,172 @@
+<% 
+    function readmore(text){
+        var count = 50;
+        return text.slice(0, count) + (text.length > count ? "..." : "");
+    }
+
+%>
+<div class="content-wrapper">
+
+    <!-- Content -->
+
+    <div class="container-xxl flex-grow-1 container-p-y">
+
+
+      <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Tin tức /</span> Danh sách
+      </h4>
+
+      <!-- Invoice List Table -->
+      <div class="card">
+        <div class="card-datatable table-responsive">
+          <div id="DataTables_Product_wrapper" class="dataTables_wrapper dt-bootstrap5">
+            <div class="card-header flex-column flex-md-row">
+              <div class="head-label text-center">
+                <h5 class="card-title mb-0">DataTable with Buttons</h5>
+              </div>
+              <div class="dt-action-buttons text-end pt-3 pt-md-0">
+                <div class="dt-buttons"> <button
+                    class="dt-button buttons-collection btn btn-label-primary dropdown-toggle me-2" tabindex="0"
+                    aria-controls="DataTables_Table_0" type="button" aria-haspopup="true"
+                    aria-expanded="false"><span><i class="bx bx-export me-sm-2"></i> <span
+                        class="d-none d-sm-inline-block">Export</span></span></button> <button
+                    class="dt-button create-new btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0"
+                    type="button"><span><i class="bx bx-plus me-sm-2"></i> 
+                      <a href="/admin/products/create" class="d-none d-sm-inline-block">Add New Record</a>
+                    </span></button> </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-md-6">
+                <div class="dataTables_length" id="DataTables_Table_0_length"><label>Show <select
+                      name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select">
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="20">20</option>
+                    </select> entries</label></div>
+              </div>
+              <div class="col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end">
+                <div id="DataTables_Table_0_filter" class="dataTables_filter"><label>
+                    <input type="search" class="form-control" placeholder="Search Product">
+                  </label></div>
+              </div>
+            </div>
+          </div>
+          <table class="datatables-basic table border-top dataTable no-footer dtr-column" id="DataTables_Product"
+            role="grid" aria-describedby="DataTables_Product_info" style="width: 1209px;">
+            <thead>
+              <tr role="row">
+                <th style="width: 25%">Tiêu đề</th>
+                <th style="width: 25%;">Danh mục</th>
+                <th style="width: 20%;" >Tác giả</th>
+                <th style="width: 20%;" >Trạng thái xuất bản</th>
+                <th style="width: 10%;">Chức năng</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% news.forEach(function(news){ %>
+                <tr>
+                  <td>
+                    <div class="d-flex justify-content-start align-items-center">
+                      <div class="avatar-wrapper">
+                        <div class="avatar me-2">
+                          
+                          <span class="avatar-initial rounded-circle bg-label-info">
+                            <img src="<%= process.env.DOMAIN_SERVER %>/uploads/<%=news.nAvatar%>">
+                          </span>
+                        </div>
+                      </div>
+                      <div class="d-flex flex-column"><span class="emp_name text-truncate"><%= readmore(news.nTitle) %></span>
+                        </div>
+                    </div>
+                  </td>
+                  <td>
+                        <span class="text-nowrap">
+                          <% news.nCategory.forEach(function(cate){ %>
+                            <a href="app-user-list.html">
+                              <span class="badge  bg-label-primary m-1"><%= cate %></span>
+                            </a>  
+                          <% })%>
+                          
+                        </span>
+                    
+                  </td>
+                  <td><%= news.nAuthor %></td>
+                  <td>
+                    <div class="col-3 text-end">
+                        <label class="switch me-0">
+                            <input  type="checkbox" class="switch-input" <% if(news.nStatus){ %> checked <% } %>>
+                                <span class="switch-toggle-slider">
+                                    <span class="switch-on">
+                                        <i class="bx bx-check"></i>
+                                    </span>
+                                    <span class="switch-off">
+                                        <i class="bx bx-x"></i>
+                                    </span>
+                                </span>
+                                <span class="switch-label"></span>
+                        </label>
+                    </div>
+                </td>
+                  <td>
+                    <div class="d-inline-block"><a href="javascript:;"
+                        class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i
+                          class="bx bx-dots-vertical-rounded"></i></a>
+                      <div class="dropdown-menu dropdown-menu-end">
+                          <a href="/admin/news/edit/<%= news._id %>" class="dropdown-item">Chỉnh sửa</a>
+                        <div class="dropdown-divider"></div><a href="javascript:(0)" class="dropdown-item text-danger delete-record">Xóa</a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th style="width: 25%">Tiêu đề</th>
+                <th style="width: 25%;">Danh mục</th>
+                <th style="width: 20%;" >Tác giả</th>
+                <th style="width: 20%;" >Trạng thái xuất bản</th>
+                <th style="width: 10%;">Chức năng</th>
+              </tr>
+            </tfoot>
+          </table>
+          <div class="row">
+            <div class="col-sm-12 col-md-6">
+              <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">Showing 1
+                to 7 of 100 entries</div>
+            </div>
+            <div class="col-sm-12 col-md-6">
+              <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+                <ul class="pagination">
+                  <li class="paginate_button page-item previous disabled" id="DataTables_Table_0_previous"><a
+                      href="#" aria-controls="DataTables_Table_0" data-dt-idx="0" tabindex="0"
+                      class="page-link">Previous</a></li>
+                  <li class="paginate_button page-item active"><a href="#" aria-controls="DataTables_Table_0"
+                      data-dt-idx="1" tabindex="0" class="page-link">1</a></li>
+                  <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
+                      data-dt-idx="2" tabindex="0" class="page-link">2</a></li>
+                  <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
+                      data-dt-idx="3" tabindex="0" class="page-link">3</a></li>
+                  <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
+                      data-dt-idx="4" tabindex="0" class="page-link">4</a></li>
+                  <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
+                      data-dt-idx="5" tabindex="0" class="page-link">5</a></li>
+                  <li class="paginate_button page-item disabled" id="DataTables_Table_0_ellipsis"><a href="#"
+                      aria-controls="DataTables_Table_0" data-dt-idx="6" tabindex="0" class="page-link">…</a></li>
+                  <li class="paginate_button page-item "><a href="#" aria-controls="DataTables_Table_0"
+                      data-dt-idx="7" tabindex="0" class="page-link">15</a></li>
+                  <li class="paginate_button page-item next" id="DataTables_Table_0_next"><a href="#"
+                      aria-controls="DataTables_Table_0" data-dt-idx="8" tabindex="0" class="page-link">Next</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>

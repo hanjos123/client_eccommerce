@@ -1,0 +1,166 @@
+<section class="page-header">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="content">
+					<h1 class="page-name">Shop</h1>
+					<ol class="breadcrumb">
+						<li><a href="index.html">Home</a></li>
+						<li class="active">shop</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+<section class="products section">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				<div class="widget">	
+					<input placeholder="Nhập tên sản phẩm cần tìm" onkeyup="find(this)" type="text"
+						class="form-control">
+				</div>
+				<!-- <div class="widget">
+					<h4 class="widget-title">Short By Color</h4>
+					<input onclick="sortbycolor(this)" checked name="color" id="all" type="radio" value="">
+					<label for="all">Tất cả</label>
+					<br>
+					<input onclick="sortbycolor(this)" name="color" id="black" type="radio" value="black">
+					<label for="black">Black</label>
+					<br>
+					<input onclick="sortbycolor(this)" name="color" id="white" type="radio" value="white">
+					<label for="white">White</label>
+				</div> -->
+				<div class="widget">
+					<h4 class="widget-title">Sắp xếp theo giá tiền</h4>
+					<input onclick="sortbyprice('asc')" name="price" id="asc" type="radio" value="black">
+					<label for="asc" for="black">Tăng dần</label>
+					<br>
+					<input onclick="sortbyprice('desc')" name="price" id="desc" type="radio" value="black">
+					<label for="desc">Giảm dần</label>
+				</div>
+			</div>
+			<div class="col-md-9 text-center">
+				<div class="row" id="list-products">
+
+					<% products.forEach(function(product){ %>
+						<%- include('products', {'product': product}) %>
+							<% }) %>
+
+				</div>
+				<button class="button dark" onclick="loadmore(this,'<%=slug%>')">Tải Thêm</button>
+			</div>
+
+
+		</div>
+	</div>
+
+	</div>
+	</div>
+</section>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script>
+	function sortbyprice(method) {
+		var $wrapper = $('#list-products');
+		if (method == 'asc') {
+			$wrapper.find('.col-md-4').sort(function (a, b) {
+				
+				 +a.dataset.price - +b.dataset.price;
+			})
+				.appendTo($wrapper);
+		} else {
+			$wrapper.find('.col-md-4').sort(function (a, b) {
+				return +b.dataset.price - +a.dataset.price;
+			})
+				.appendTo($wrapper);
+		}
+
+	}
+	
+	function sortbycolor(ele) {
+		var str = $(ele).val();
+		$('#list-products .col-md-4').filter(function () {
+			$(this).toggle($(this).text().toLowerCase().indexOf(str.toLowerCase()) > -1);
+		})
+	}
+	function find(ele) {
+		var str = $(ele).val();
+		$('#list-products .col-md-4').filter(function () {
+			$(this).toggle($(this).text().toLowerCase().indexOf(str.toLowerCase()) > -1);
+		})
+	}
+
+	let i = 2;
+	function loadmore(ele, slug) {
+		$.ajax({
+			async: true,
+			type: "POST",
+			url: "<%= process.env.DOMAIN_API %>/getallproductbyslug",
+			data: { slug: slug, perPage: 9, page: i },
+			dataType: 'json',
+			cache: false,
+			success: function (res) {
+				if (res.info.length == 0) {
+					ele.remove()
+				} else {
+					appendProduct(res)
+					i++;
+				}
+
+			},
+			error: function () {
+			}
+		})
+	}
+
+	function appendProduct(res) {
+		let html = ``;
+		res.info.forEach(function (product) {
+			if (product.Sale) {
+				if (new Date(product.Sale.start) < Date.now() && Date.now() < new Date(product.Sale.end)) {
+					html += `<div data-price="${product.PriceDiscount}" class="col-md-4 animated zoomIn">`;
+				}
+			} else {
+				html += `<div data-price="${product.Price}" class="col-md-4 animated zoomIn">`;
+			}
+			html += `
+		<div class="product-item">
+		<div class="product-thumb">`;
+			if (product.Sale) {
+				if (new Date(product.Sale.start) < Date.now() && Date.now() < new Date(product.Sale.end)) {
+					html += `<span class="bage">Sale</span>`;
+				}
+			}
+			html += `<img class="img-responsive" src="<%= process.env.DOMAIN_SERVER %>/uploads/${product.Product_image[0]}" alt="product-img" />
+            <div class="preview-meta">
+                <ul>
+                    <li>
+                        <a href="javascript:(0)" onclick="addToCart('${product.Product_slug}')">Thêm Vào Giỏ Hàng</a>
+                    </li>
+                </ul>
+			</div>
+        </div>
+        <div class="product-content">
+            
+            <h4><a href="/products/${product.Product_slug}">${product.Product_name}</a></h4>`;
+			if (product.Sale) {
+				if (new Date(product.Sale.start) < Date.now() && Date.now() < new Date(product.Sale.end)) {
+					html += `<p class="price"><span class="text-strike">${Intl.NumberFormat().format(product.Price)} ₫</span> ${Intl.NumberFormat().format(product.PriceDiscount)} ₫</p>`;
+
+				}
+			} else {
+				html += `<p class="price">${Intl.NumberFormat().format(product.Price)}₫</p>`;
+			}
+			html += `</div>
+					</div>
+				</div>`;
+		})
+		$('#list-products').append(html);
+	}
+
+
+
+</script>

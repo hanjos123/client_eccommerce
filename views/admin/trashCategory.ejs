@@ -1,0 +1,136 @@
+<div class="content-wrapper">
+    <!-- Content -->
+
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4">
+            <span class="text-muted fw-light">Sản phẩm /</span> Thùng rác
+        </h4>
+
+        <!-- Invoice List Table -->
+        <div class="card">
+            <div class="card-datatable table-responsive">
+                <div id="DataTables_Product_wrapper" class="dataTables_wrapper dt-bootstrap5">
+                    <div class="row ms-2 me-3">
+                        <div
+                            class="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-2">
+                            <div id="DataTables_Table_0_filter" class="dataTables_filter"><label>
+                                    <input onkeyup="find(this)" type="search" class="form-control"
+                                        placeholder="Tìm kiếm..."></label></div>
+                        </div>
+                    </div>
+                </div>
+                <table id="list" class="datatables-basic table border-top dataTable no-footer dtr-column"
+                    id="DataTables_Product" role="grid" aria-describedby="DataTables_Product_info"
+                    style="width: 1209px">
+                    <thead>
+                        <tr role="row">
+                            <th style="width: 25%">Sản phẩm</th>
+                            <th style="width: 25%">Danh Mục</th>
+                            <th style="width: 10%">Giá</th>
+                            <th style="width: 30%">Giảm giá</th>
+                            <th style="width: 5%">Hiển thị</th>
+                            <th style="width: 5%">Chức năng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listpro">
+                        <% products.forEach(function(pro){ %>
+                            <tr>
+                                <td>
+                                    <div class="d-flex justify-content-start align-items-center">
+                                        <div class="avatar-wrapper">
+                                            <div class="avatar me-2">
+                                                <span class="avatar-initial rounded-circle bg-label-info">
+                                                    <img
+                                                        src="<%= process.env.DOMAIN_SERVER %>/uploads/<%= pro.Product_image[0] %>" />
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-column">
+                                            <span class="emp_name text-truncate">
+                                                <%= pro.Product_name %>
+                                            </span><small class="emp_post text-truncate text-muted">Software Test
+                                                Engineer</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <% pro.Category_slug.forEach(function(cate){ %>
+                                        <span class="text-nowrap">
+                                            <a href="app-user-list.html">
+                                                <span class="badge bg-label-primary m-1">
+                                                    <%= cate %>
+                                                </span>
+                                            </a>
+                                        </span>
+                                        <% }) %>
+                                </td>
+                                <td>
+                                    <%= Intl.NumberFormat().format(pro.Price) %>₫
+                                </td>
+                                <td>
+                                    <% if(pro.Sale){ %>
+                                        <% if(new Date(pro.Sale.start) < new Date() && new Date() < new
+                                            Date(pro.Sale.end)){ %>
+                                            <h6>Bắt đầu: <%= dateformat(pro.Sale.start) %>
+                                            </h6>
+                                            <h6>Kết thúc: <%= dateformat(pro.Sale.end) %>
+                                            </h6>
+                                            <h6>
+                                                Giá giảm: <%= Intl.NumberFormat().format(pro.PriceDiscount) %>₫
+                                            </h6>
+                                            <% } %>
+                                                <% } %>
+                                </td>
+                                <td>
+                                    <div class="col-3 text-end">
+                                        <label class="switch me-0">
+                                            <input onclick="status('<%= pro._id %>',this)" type="checkbox"
+                                                class="switch-input" <% if(pro.Status){ %> checked <% } %>>
+                                                <span class="switch-toggle-slider">
+                                                    <span class="switch-on">
+                                                        <i class="bx bx-check"></i>
+                                                    </span>
+                                                    <span class="switch-off">
+                                                        <i class="bx bx-x"></i>
+                                                    </span>
+                                                </span>
+                                                <span class="switch-label"></span>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-inline-block">
+                                        <a href="javascript:;"
+                                            class="btn btn-sm btn-icon dropdown-toggle hide-arrow"
+                                            data-bs-toggle="dropdown"><i
+                                                class="bx bx-dots-vertical-rounded"></i></a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <a href="/admin/products/edit/<%=pro._id%>" class="dropdown-item">Chỉnh
+                                                sửa</a>
+                                            <a href="/admin/products/duplicate/<%=pro._id%>"
+                                                class="dropdown-item">Nhân đôi</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a href="/admin/products/delete/<%=pro._id%>"
+                                                class="dropdown-item text-danger delete-record">Xóa</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th style="width: 25%">Sản phẩm</th>
+                            <th style="width: 25%">Danh Mục</th>
+                            <th style="width: 10%">Giá</th>
+                            <th style="width: 30%">Giảm giá</th>
+                            <th style="width: 10%">Chức năng</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="<%= process.env.DOMAIN_SERVER %>/assets/vendor/libs/sweetalert2/sweetalert2.js"></script>

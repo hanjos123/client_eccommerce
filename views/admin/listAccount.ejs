@@ -1,0 +1,116 @@
+<div class="content-wrapper">
+    <!-- Content -->
+
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4">
+            <span class="text-muted fw-light">Tài khoản /</span> Danh sách
+        </h4>
+
+        <!-- Invoice List Table -->
+        <div class="card">
+            <div class="card-datatable table-responsive">
+                <div id="DataTables_Product_wrapper" class="dataTables_wrapper dt-bootstrap5">
+                    <div class="row ms-2 me-3">
+                        <div
+                            class="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-2">
+                            <div
+                                class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start mt-md-0 mt-3">
+                                <div class="dt-buttons">
+                                    <a href="/admin/products/trash" class="dt-button btn btn-primary" >
+                                        Thùng rác ()
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-2">
+                            <div id="DataTables_Table_0_filter" class="dataTables_filter"><label>
+                                    <input onkeyup="find(this)" type="search" class="form-control"
+                                        placeholder="Tìm kiếm..."></label></div>
+                        </div>
+                    </div>
+                </div>
+                <table id="list" class="datatables-basic table border-top dataTable no-footer dtr-column"
+                    id="DataTables_Product" role="grid" aria-describedby="DataTables_Product_info"
+                    style="width: 1209px">
+                    <thead>
+                        <tr role="row">
+                            <th style="width: 25%">Tài Khoản</th>
+                            <th style="width: 25%">Họ Tên</th>
+                            <th style="width: 10%">Email</th>
+                            <th style="width: 30%">Số điện thoại</th>
+                            <th style="width: 5%">Khóa tài khoản</th>
+                            <th style="width: 5%">Chức năng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listpro">
+                        <% users.forEach(function(user){ %>
+                            <tr>
+                                <td><%= user.UserName %></td>
+                                <td><%= user.Name %></td>
+                                <td><%= user.Email %></td>
+                                <td><%= user.Phone %></td>
+                                <td><div class="col-3 text-end">
+                                    <label class="switch me-0">
+                                        <input onclick="status('<%= user._id %>',this)" type="checkbox"
+                                            class="switch-input" <% if(user.Status == 0){ %> checked <% } %>>
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on">
+                                                    <i class="bx bx-check"></i>
+                                                </span>
+                                                <span class="switch-off">
+                                                    <i class="bx bx-x"></i>
+                                                </span>
+                                            </span>
+                                            <span class="switch-label"></span>
+                                    </label>
+                                </div></td>
+                                <td></td>
+
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th style="width: 25%">Tài Khoản</th>
+                            <th style="width: 25%">Họ Tên</th>
+                            <th style="width: 10%">Email</th>
+                            <th style="width: 30%">Số điện thoại</th>
+                            <th style="width: 5%">Khóa tài khoản</th>
+                            <th style="width: 5%">Chức năng</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function status(id) {
+        $.ajax({
+            async: true,
+            type: "GET",
+            url: "<%= process.env.DOMAIN_SERVER %>/v1/api/changestatusaccount/" + id,
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "json",
+            data: { id },
+            success: function (res) {
+                console.log(res);
+                if (res.status == 'failed') {
+                    Swal.fire({
+                        title: "Oops...",
+                        text: "Xảy ra lỗi",
+                        icon: "error",
+                    });
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000)
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            },
+        })
+    }
+</script>

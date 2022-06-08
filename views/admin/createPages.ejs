@@ -1,0 +1,160 @@
+<div class="container-xxl flex-grow-1 container-p-y">
+    <form id="formCreatePage" action="<%= process.env.DOMAIN_API %>/creatpages" method="post">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Bài viết/</span> Tạo mới
+    </h4>
+
+
+    <div class="row invoice-add">
+        <!-- Invoice Add-->
+        <div class="col-lg-9 col-12 mb-lg-0 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row p-sm-3 p-0">
+                        <div class="mb-3">
+                            <label class="form-label" for="basic-default-fullname">Nội dung <span class="text-danger">(*)</span></label>
+                            <div id="size-group" class="input-group">
+                                <textarea name="pBody" id="editor1" style="width: 100%"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Invoice Add-->
+
+        <!-- Invoice Actions -->
+        <div class="col-lg-3 col-12 invoice-actions">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <label class="form-label" for="title">Tiêu đề <span class="text-danger">(*)</span></label>
+                    <input onkeyup="ChangeToSlug(this)" required name="pTitle" type="text" class="form-control mb-3" id="title" placeholder="Nhập tiêu đề">
+                    <label class="form-label" for="title">Đường dẫn <span class="text-danger">(*)</span></label>
+                    <input id="pSlug" required name="pSlug" type="text" class="form-control" id="title" placeholder="Nhập đường dẫn">
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary d-grid w-100 mb-3">Lưu</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    </form>
+</div>
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content text-center">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div  class="modal-body onboarding-horizontal p-0">
+                <div class="onboarding-content mb-0">
+                    <h4 class="onboarding-title text-body">Thêm Danh Mục Sản Phẩm Mới</h4>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label for="nameEx7" class="form-label">Tên Danh Mục</label>
+                                <input name="name" onkeyup="ChangeToSlug()" id="namecate" class="form-control" placeholder="Nhập Tên Danh Mục Muốn Thêm" type="text" value="" tabindex="0" id="nameEx7">
+                            </div>
+                            <div class="mb-3">
+                                <label for="nameEx7" class="form-label">Đường Dẫn Danh Mục</label>
+                                <input name="slug" id="slug" class="form-control" placeholder="Nhập Đường Dẫn Danh Mục Muốn Thêm" type="text" value="" tabindex="0" id="nameEx7">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button onclick="addCate()" type="button" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/assets/vendor/libs/jquery/jquery.js"></script>
+<script src="/assets/vendor/libs/ckeditor/ckeditor.js"></script>
+<script>
+    $("#formCreatePage").submit(function (e) {
+        e.preventDefault();
+        var form = $(this);
+        var actionUrl = form.attr('action');
+
+        $.ajax({
+            type: "POST",
+            url: actionUrl,
+            data: form.serialize(),
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                if (data.status == 'error') {
+                    Swal.fire({
+                        title: "Oops...",
+                        text: data.info.message,
+                        icon: "error",
+                        timer: 1000
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: data.info.message,
+                        showConfirmButton: false,
+                        timer: 1000
+                    })
+                }
+            },
+            error: function (error) {
+                console.log('lỗi');
+            }
+        });
+    });
+
+    CKEDITOR.replace('editor1', {
+        width: '100%',
+        height: '40rem'
+    });
+    function ChangeToSlug(ele){
+        var title, slug;
+    
+        //Lấy text từ thẻ input title 
+        title = $(ele).val();
+    
+        //Đổi chữ hoa thành chữ thường
+        slug = title.toLowerCase();
+    
+        //Đổi ký tự có dấu thành không dấu
+        slug = slug.replace(/á|à|ả|ạ|ã|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/gi, 'a');
+        slug = slug.replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/gi, 'e');
+        slug = slug.replace(/i|í|ì|ỉ|ĩ|ị/gi, 'i');
+        slug = slug.replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/gi, 'o');
+        slug = slug.replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/gi, 'u');
+        slug = slug.replace(/ý|ỳ|ỷ|ỹ|ỵ/gi, 'y');
+        slug = slug.replace(/đ/gi, 'd');
+        //Xóa các ký tự đặt biệt
+        slug = slug.replace(/\`|\~|\!|\@|\#|\||\$|\%|\^|\&|\*|\(|\)|\+|\=|\,|\.|\/|\?|\>|\<|\'|\"|\:|\;|_/gi, '');
+        //Đổi khoảng trắng thành ký tự gạch ngang
+        slug = slug.replace(/ /gi, "-");
+        slug = slug.replace(/[^-a-zа-я\u0370-\u03ff\u1f00-\u1fff]+/g, '')
+        //Đổi nhiều ký tự gạch ngang liên tiếp thành 1 ký tự gạch ngang
+        //Phòng trường hợp người nhập vào quá nhiều ký tự trắng
+        slug = slug.replace(/\-\-\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-/gi, '-');
+        //Xóa các ký tự gạch ngang ở đầu và cuối
+        slug = '@' + slug + '@';
+        slug = slug.replace(/\@\-|\-\@|\@/gi, '');
+        //In slug ra textbox có id “slug”
+        document.getElementById('pSlug').value = slug;
+    }
+</script>
+<style>
+    
+    textarea.cke_source{
+        color: black !important;
+    }
+</style>

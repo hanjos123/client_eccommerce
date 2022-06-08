@@ -1,0 +1,70 @@
+<% 
+    function readmore(text){
+        var count = 300;
+        return text.slice(0, count) + (text.length > count ? "..." : "");
+    }
+
+%>
+<section class="page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="content">
+                    <h1 class="page-name">Blog</h1>
+                    <ol class="breadcrumb">
+                        <li><a href="index.html">Home</a></li>
+                        <li class="active">blog</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="page-wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <% listNews.forEach(function(news){ %>
+                    <div class="post">
+                        <div class="post-media post-thumb">
+                            <a href="blog-single.html">
+                                <img style="max-height: 300px;" src="<%= process.env.DOMAIN_SERVER %>/uploads/<%= news.nAvatar %>" alt="" />
+                            </a>
+                        </div>
+                        <h2 class="post-title">
+                            <a href="/news/<%= news.nSlug %>"><%= news.nTitle %></a>
+                        </h2>
+                        <div class="post-meta">
+                            <ul>
+                                <li><i class="tf-ion-ios-calendar"></i> <%= news.createdAt %></li>
+                                <li><i class="tf-ion-android-person"></i> POSTED BY <%= news.nAuthor %></li>
+                                <li><i class="tf-ion-ios-pricetags"></i>
+                                    <% news.nCategory.forEach(function(cate){ %>
+                                        <a href="/news/<%= cate %>"><%= cate %></a>
+                                    <% }) %>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="post-content" style="overflow-wrap: break-word;">
+                            <%- readmore(news.nBody) %>
+                        </div>
+                        <a href="/news/<%= news.nSlug %>" class="button dark">Đọc tiếp</a>
+                    </div>
+                <% }) %>
+                
+                <div class="text-center">
+                    <ul class="pagination post-pagination">
+                        <li><a href="#!">Prev</a></li>
+                        <li class="active"><a href="#!">1</a></li>
+                        <li><a href="#!">2</a></li>
+                        <li><a href="#!">3</a></li>
+                        <li><a href="#!">4</a></li>
+                        <li><a href="#!">5</a></li>
+                        <li><a href="#!">Next</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

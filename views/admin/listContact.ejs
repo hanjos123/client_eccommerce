@@ -1,0 +1,161 @@
+<div class="content-wrapper">
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4">
+            <span class="text-muted fw-light">Ý kiên khách hàng /</span> Danh Sách
+        </h4>
+        <div class="card">
+            <div class="card-datatable table-responsive">
+                <div id="DataTables_Product_wrapper" class="dataTables_wrapper dt-bootstrap5">
+                    <div class="row ms-2 me-3">
+                        <div
+                            class="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-2">
+                            <div class="dataTables_filter">
+                                <input onkeyup="findCate(this)" type="search" class="form-control"
+                                    placeholder="Tìm kiếm...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="datatables-basic table border-top dataTable no-footer dtr-column" id="listcategory"
+                role="grid" aria-describedby="DataTables_Product_info" style="width: 1209px;">
+                <thead>
+                    <tr role="row">
+                        <th style="width: 20%">Tên khách hàng</th>
+                        <th style="width: 20%;">Số điện thoại</th>
+                        <th style="width: 20%;">Email</th>
+                        <th style="width: 20%;">Trạng thái</th>
+                        <th style="width: 20%;">Chức năng</th>
+                    </tr>
+                </thead>
+                <tbody id="list">
+                    <% contact.forEach(function(contact){ %>
+                        <tr>
+                            <td>
+                                <%= contact.Name %>
+                            </td>
+                            <td>
+                                <%= contact.NumberPhone %>
+                            </td>
+                            <td>
+                                <%= contact.Email %>
+                            </td>
+                            <td>
+                                <%= contact.Status %>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="dropdown">
+                                        <a href="javascript:;" class="btn dropdown-toggle hide-arrow text-body p-0"
+                                            data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></a>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <button onclick="setValue('<%= contact._id %>')" class="dropdown-item" type="button" data-bs-toggle="offcanvas"
+                                                data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Phản hồi</button>
+                                            <button onclick="deleteContact('<%= contact._id %>')" class="dropdown-item delete-record text-danger">Xóa</button>
+                                        </div>
+                                    </div>
+                                </div>
+        </div>
+        </td>
+
+        </tr>
+        <% }) %>
+            </tbody>
+            </table>
+    </div>
+</div>
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasRightLabel">Phản hổi khách hàng</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="mb-3">
+            <label class="form-label" for="eventDescription">Nội dung khách hàng</label>
+            <textarea class="form-control" readonly id="opinion" rows="auto"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="eventDescription">Nội dung trả lời cho khách hàng</label>
+            <textarea class="form-control" id="contactforcustom" name="detail" rows="10"></textarea>
+        </div>  
+    </div>
+    <button type="button" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Đóng</button>
+    <button id="buttonSendContact" onclick="sendContact()" type="button" data-bs-dismiss="offcanvas" class="btn btn-primary">Gửi</button>
+</div>
+
+<script src="../../assets/vendor/libs/jquery/jquery.js"></script>
+<script>
+    function deleteContact(id){
+        $.ajax({
+            async: true,
+            url: "<%= process.env.DOMAIN_API %>/deletecontact/" + id,
+            type: 'GET',
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "json",
+            success: function (res) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Xóa thành công',
+                    showConfirmButton: false,
+                    timer: 1000
+                })
+            },
+            error: function (xhr) {
+                // alert(id);
+                console.log(xhr.responseText);
+            },
+        });
+    }
+
+    function setValue(id) {
+        $.ajax({
+            async: true,
+            url: "<%= process.env.DOMAIN_API %>/getonecontact/" + id,
+            type: 'GET',
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "json",
+            success: function (res) {
+                console.log(res);
+                $('#opinion').val(res.Detail);
+                $('#buttonSendContact').attr('onclick', 'sendContact("'+res._id+'")');
+                if(res.Status == 'Đã phản hồi'){
+                    $('#contactforcustom').val(res.AdminToCustomer);
+                } else {
+                    $('#contactforcustom').val('');
+                }
+            },
+            error: function (xhr) {
+                // alert(id);
+                console.log(xhr.responseText);
+            },
+        });
+    }
+
+    function sendContact(id){
+        var msg = $('#contactforcustom').val();
+        $.ajax({
+            async: true,
+            url: "<%= process.env.DOMAIN_API %>/sendcontact/" + id,
+            type: 'POST',
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "json",
+            data: { msg },
+            success: function (res) {
+                
+            },
+            error: function (xhr) {
+                // alert(id);
+                console.log(xhr.responseText);
+            },
+        });
+    }
+
+    function findCate(ele) {
+        var str = $(ele).val();
+        $('#list tr').filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(str.toLowerCase()) > -1);
+        })
+    }
+</script>

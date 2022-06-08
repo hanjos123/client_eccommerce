@@ -1,0 +1,42 @@
+
+    <% if(product.Sale){ %>
+        <% if(new Date(product.Sale.start) < Date.now() && Date.now() < new Date(product.Sale.end)){ %>
+            <div data-price="<%= product.PriceDiscount %>" class="col-md-4">
+        <% } else { %>
+            <div data-price="<%= product.Price %>" class="col-md-4">
+        <% } %>
+    <% } else { %>
+        <div data-price="<%= product.Price %>" class="col-md-4">
+    <% } %>
+    <div  class="product-item">
+        <div class="product-thumb">
+            <% if(product.Sale){ %>
+                <% if(new Date(product.Sale.start) < Date.now() && Date.now() < new Date(product.Sale.end)){ %>
+                    <span class="bage">Sale</span>
+                <% } %>
+            <% } %>
+            <img class="img-responsive" src="<%= process.env.DOMAIN_SERVER %>/uploads/<%= product.Product_image[0] %>" alt="product-img" />
+            <div class="preview-meta">
+                <ul>
+                    <li>
+                        <a href="javascript:(0)" onclick="addToCart('<%= product.Product_slug %>')">Thêm Vào Giỏ Hàng</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="product-content">
+            
+            <h4><a href="/products/<%= product.Product_slug %>"><%= product.Product_name %></a></h4>
+            <% if(product.Sale){ %>
+                <% if(new Date(product.Sale.start) < Date.now() && Date.now() < new Date(product.Sale.end)){ %>
+                    <p class="price"><span class="text-strike"><%= Intl.NumberFormat().format(product.Price) %>₫</span> <%= Intl.NumberFormat().format(product.PriceDiscount) %>₫</p>
+                    
+                <% } else { %>
+                    <p class="price"><%= Intl.NumberFormat().format(product.Price) %>₫</p>
+                <% } %>
+            <% } else { %>
+                <p class="price"><%= Intl.NumberFormat().format(product.Price) %>₫</p>
+            <% } %>
+        </div>
+    </div>
+</div>

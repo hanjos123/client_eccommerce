@@ -1,0 +1,40 @@
+<li id="cart-content" class="dropdown cart-nav dropdown-slide">
+    <a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"><i class="tf-ion-android-cart"></i>Cart</a>
+    <div class="dropdown-menu cart-dropdown">
+
+        <!-- Cart Item -->
+        
+        <% let sum=0; if(products.length !=0){ 
+            products.forEach(function(pro, i){ %>
+            <div class="media">
+                <a class="pull-left" href="#!">
+                    <img class="media-object" src="<%= pro.Product_avatar %>" alt="image">
+                </a>
+                <div class="media-body">
+                    <h4 class="media-heading"><a href="/products/<%= pro.Product_slug %>"><%= pro.Product_name %></a></h4>
+                    <div class="cart-price">
+                        <p>Size: <%= cart.Inventory[i].Size %> x</p>
+
+                        <span><%= cart.Inventory[i].Quantity %> x</span>
+                        <span><%= Intl.NumberFormat().format(pro.Price) %>₫</span>
+                    </div>
+                    <h5><strong><%= Intl.NumberFormat().format(cart.Inventory[i].Quantity * pro.Price) %>₫</strong></h5>
+                </div>
+                <a href="javascript:(0)" onclick="deleteOneCart('<%= cart.Inventory[i]._id %>')" class="remove"><i class="tf-ion-close"></i></a>
+            </div>
+        <% sum +=  cart.Inventory[i].Quantity * pro.Price  })%>
+        
+        <% if(products != null){ %>
+            <div class="cart-summary">
+                <span>Total</span>
+                <span class="total-price"><%= Intl.NumberFormat().format(sum) %>₫</span>
+            </div>
+            <ul class="text-center cart-buttons">
+                <li><a href="/cart" class="btn btn-small">View Cart</a></li>
+                <li><a href="/checkout" class="btn btn-small btn-solid-border">Checkout</a></li>
+            </ul>
+        <% }} else { %>
+            <h4 style="text-align: center;">Chưa có sản phẩm được thêm</h4>
+        <% } %>
+    </div>
+</li>

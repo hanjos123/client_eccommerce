@@ -1,0 +1,202 @@
+<section class="single-product">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="shop.html">Shop</a></li>
+                    <li class="active">Single Product</li>
+                </ol>
+            </div>
+        </div>
+        <div class="row mt-20">
+            <div class="col-md-5">
+                <div class="single-product-slider">
+                    <div id='carousel-custom' class='carousel slide' data-ride='carousel'>
+                        <div class='carousel-outer'>
+                            <!-- me art lab slider -->
+                            
+                            <div class='carousel-inner '>
+                                <div class='item active'>
+                                    <img src='<%=process.env.DOMAIN_SERVER %>/uploads/<%= product.Product_image[0] %>' alt='' data-zoom-image="<%= product.Product_avatar %>" />
+                                </div>
+                                <% for(i=1; i < product.Product_image.length; i++){ %>
+                                    <div class='item'>
+                                        <img src='<%=process.env.DOMAIN_SERVER %>/uploads/<%= product.Product_image[i] %>' alt='' data-zoom-image="<%= product.Product_image[i] %>" />
+                                    </div>
+                                <% } %>
+                            </div   >
+                            <!-- sag sol -->
+                            <a class='left carousel-control' href='#carousel-custom' data-slide='prev'>
+                                <i class="tf-ion-ios-arrow-left"></i>
+                            </a>
+                            <a class='right carousel-control' href='#carousel-custom' data-slide='next'>
+                                <i class="tf-ion-ios-arrow-right"></i>
+                            </a>
+                        </div>
+                        <!-- thumb -->
+                        <ol class='carousel-indicators mCustomScrollbar meartlab'>
+                            <li data-target='#carousel-custom' data-slide-to='0' class='active'>
+                                <img src='<%= process.env.DOMAIN_SERVER %>/uploads/<%= product.Product_image[0] %>' alt='' />
+                            </li>
+                            <% for(i=1; i < product.Product_image.length; i++){ %>
+                                <li data-target='#carousel-custom' data-slide-to='<%= i %>'>
+                                    <img src='<%= process.env.DOMAIN_SERVER %>/uploads/<%= product.Product_image[i] %>' alt='' />
+                                </li>
+                            <% } %>
+                                </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="single-product-details">
+                    <h2>
+                        <%= product.Product_name %>
+                    </h2>
+                    <p class="product-price">
+                        <%= Intl.NumberFormat().format(product.Price) %>₫
+                    </p>
+                    <div class="product-size">
+                        <span>Size:</span>
+                        <select id="size" class="form-control">
+                            <% product.Size.forEach(function(pro){ if(pro.Quantity>0){%>
+                                <option>
+                                    <%= pro.Name_size %>
+                                </option>
+                                <% }}) %>
+                        </select>
+                    </div>
+                    <div class="product-quantity">
+                        <span>Số lượng:</span>
+                        <div class="product-quantity-slider">
+                            <input id="quantity" min="1" id="product-quantity" type="text" value="1" name="product-quantity">
+                        </div>
+                    </div>
+                    <div class="product-category">
+                        <span>Danh mục:</span>
+                        <ul>
+                            <% product.Category_slug.forEach(function(cate){ %>
+                                <li><a href="/collections/<%= cate %>">
+                                        <%= cate.toUpperCase(); %>
+                                    </a></li>
+                                <% }) %>
+                        </ul>
+                    </div>
+                    <a href="javascript:(0)" onclick="addToCart('<%= product.Product_slug %>')" class="button dark mt-20">Thêm vào giỏ hàng</a>
+                    </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="tabCommon mt-20">
+                    <ul class="nav nav-tabs">
+                        <a class="button dark" data-toggle="tab" href="#details" aria-expanded="true">Chi tiết sản phẩm</a>
+                        <!-- <a class="button dark" data-toggle="tab" href="#reviews" aria-expanded="false">Reviews (3)</a> -->
+                    </ul>
+                    <div class="tab-content patternbg">
+                        <div id="details" class="tab-pane fade active in">
+                            <h4>Mô tả sản phẩm</h4>
+                            <%- product.Product_detail %>
+                        </div>
+                        <div id="reviews" class="tab-pane fade">
+                            <h4>Bình luận</h4>
+                            <div class="fb-comments" data-href="<%= process.env.DOMAIN_NAME %>/products/<%=product.Product_slug%>" data-width="" data-numposts="5"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</section>
+<section class="products related-products section">
+    <div class="container">
+        <div class="row">
+            <div class="title text-center">
+                <h2>Sản phẩm khác</h2>
+            </div>
+        </div>
+        <div class="row">
+            <% proSuggest.forEach(function(product){ %>
+                
+    <% if(product.Sale){ %>
+        <% if(new Date(product.Sale.start) < Date.now() && Date.now() < new Date(product.Sale.end)){ %>
+            <div data-price="<%= product.PriceDiscount %>" class="col-md-3">
+        <% } else { %>
+            <div data-price="<%= product.Price %>" class="col-md-3">
+        <% } %>
+    <% } else { %>
+        <div data-price="<%= product.Price %>" class="col-md-3">
+    <% } %>
+    <div  class="product-item">
+        <div class="product-thumb">
+            <% if(product.Sale){ %>
+                <% if(new Date(product.Sale.start) < Date.now() && Date.now() < new Date(product.Sale.end)){ %>
+                    <span class="bage">Sale</span>
+                <% } %>
+            <% } %>
+            <img class="img-responsive" src="<%= process.env.DOMAIN_SERVER %>/uploads/<%= product.Product_image[0] %>" alt="product-img" />
+            <div class="preview-meta">
+                <ul>
+                    <li>
+                        <a href="javascript:(0)" onclick="addToCart('<%= product.Product_slug %>')">Thêm Vào Giỏ Hàng</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="product-content">
+            
+            <h4><a href="/products/<%= product.Product_slug %>"><%= product.Product_name %></a></h4>
+            <% if(product.Sale){ %>
+                <% if(new Date(product.Sale.start) < Date.now() && Date.now() < new Date(product.Sale.end)){ %>
+                    <p class="price"><span class="text-strike"><%= Intl.NumberFormat().format(product.Price) %>₫</span> <%= Intl.NumberFormat().format(product.PriceDiscount) %>₫</p>
+                    
+                <% } else { %>
+                    <p class="price"><%= Intl.NumberFormat().format(product.Price) %>₫</p>
+                <% } %>
+            <% } else { %>
+                <p class="price"><%= Intl.NumberFormat().format(product.Price) %>₫</p>
+            <% } %>
+        </div>
+    </div>
+</div>
+            <% }) %>
+            
+                </div>
+    </div>
+    </section>
+
+
+
+<!-- Modal -->
+<div class="modal product-modal fade" id="product-modal">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <i class="tf-ion-close"></i>
+    </button>
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="modal-image">
+                            <img class="img-responsive" src="../images/shop/products/modal-product.jpg" />
+                        </div>
+                        </div>
+                    <div class="col-md-3">
+                        <div class="product-short-details">
+                            <h2 class="product-title">GM Pendant, Basalt Grey</h2>
+                            <p class="product-price">$200</p>
+                            <p class="product-short-description">
+                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem iusto nihil cum. Illo laborum numquam rem aut
+                                officia dicta cumque.
+                            </p>
+                            <a href="javascript:(0)" class="btn btn-main" onclick="addToCart('<%= product.Product_slug %>')">Addt To Cart</i></a>
+                            <a href="#!" class="btn btn-transparent">View Product Details</a>
+                        </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v13.0&appId=324096405859098&autoLogAppEvents=1" nonce="V11x8EOY"></script>

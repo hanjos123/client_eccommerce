@@ -1,0 +1,70 @@
+<% function convert(str) { var date=new Date(str), mnth=("0" + (date.getMonth() + 1)).slice(-2), day=("0" +
+    date.getDate()).slice(-2); return [day, mnth, date.getFullYear()].join("/"); } %>
+<section class="page-header">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="content">
+					<h1 class="page-name">Dashboard</h1>
+					<ol class="breadcrumb">
+						<li><a href="/">Trang Chủ</a></li>
+						<li class="active">Tài Khoản Của Tôi</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+<section class="user-dashboard page-wrapper">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<ul class="list-inline dashboard-menu text-center">
+					<ul class="list-inline dashboard-menu text-center">
+						<li><a class="active" href="/account">Lịch sử đơn hàng</a></li>
+						<li><a href="/account/info">Thông tin tài khoản</a></li>
+					</ul>
+				</ul>
+				<div class="dashboard-wrapper user-dashboard">
+					<div class="total-order mt-20">
+						<h4>Total Orders</h4>
+						<div class="table-responsive">
+							<table class="table">
+								<thead>
+									<tr>
+                                        <th>Mã hóa đơn</th>
+                                        <th>Ngày đặt hàng</th>
+                                        <th>Số lượng</th>
+                                        <th>Trạng thái</th>
+                                        <th>Tổng thanh toán</th>
+									</tr>
+								</thead>
+								<tbody>
+                                    <% order.forEach(function(c){ %>
+                                        <tr>
+                                            <td><a href="/order/<%=c._id%>">#<%=c._id%></a></td>
+                                            <td>
+                                                <%= convert(c.createdAt) %>
+                                            </td>
+                                            <td>
+                                                <%=c.allProduct.length%>
+                                            </td>
+                                            <td>
+                                                <%=c.Status%>
+                                            </td>
+                                            <td>
+                                                <%= Intl.NumberFormat().format(c.Total) %>₫
+                                            </td>
+                                            </tr>
+                                    <% }) %>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

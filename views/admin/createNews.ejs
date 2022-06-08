@@ -1,0 +1,156 @@
+<div class="container-xxl flex-grow-1 container-p-y">
+    <form id="frm" action="<%= process.env.DOMAIN_API %>/creatnews" method="post">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Bài viết/</span> Tạo mới
+    </h4>
+
+
+    <div class="row invoice-add">
+        <!-- Invoice Add-->
+        <div class="col-lg-9 col-12 mb-lg-0 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row p-sm-3 p-0">
+                        <div class="mb-3">
+                            <label class="form-label" for="title">Tiêu đề bài viết <span class="text-danger">(*)</span></label>
+                            <input name="nTitle" type="text" class="form-control" id="title" placeholder="Nhập tiêu đề bài viết">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="basic-default-fullname">Nội dung bài viết<span class="text-danger">(*)</span></label>
+                            <div id="size-group" class="input-group">
+                                <textarea name="nBody" id="editor1" style="width: 100%"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Invoice Add-->
+
+        <!-- Invoice Actions -->
+        <div class="col-lg-3 col-12 invoice-actions">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row p-sm-3 p-0">
+                        
+                    </div>
+                    <p>Xuất bản<span class="text-danger">(*)</span></p>
+                    <select id="defaultSelect" name="nStatus" class="mb-2 form-select">
+                        <option value="true">Có</option>
+                        <option value="false">Không</option>
+                    </select>
+                    <p class="mb-2">Danh mục sản phẩm <span class="text-danger">(*)</span></p>
+                    <% category.cateParent0.forEach(function(cate){ %>
+                        <% category.cateParentId.forEach(function(cate1){ %>
+                            <% if(cate.cUrl == 'news' && cate1.cParentId == cate._id && cate1.cUrl != ''){ %>
+                                <button type="button" onclick="addCategory('<%= cate1.cUrl %>','<%= cate1.cName %>')" class="btn btn-primary mb-1"><%= cate1.cName %></button>
+                            <% } %>
+                        <% }) %>
+                    <% }) %>
+                    <button id="btnAddCate" type="button" class="btn btn-primary mb-1" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                        Thêm Danh Mục Mới
+                    </button>
+                    <ul class="content"></ul>
+
+                    <p class="mb-2">Ảnh đại diện bài viết <span class="text-danger">(*)</span></p>
+                    <button onclick="changeCheckBoxToRadio()" type="button" class="mb-12 col-sm-12 btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#imageLibrary">Chọn</button>
+                    <div class="row" id="avatarNews">
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-primary d-grid w-100 mb-3">Lưu</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    </form>
+</div>
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content text-center">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div  class="modal-body onboarding-horizontal p-0">
+                <div class="onboarding-content mb-0">
+                    <h4 class="onboarding-title text-body">Thêm Danh Mục Sản Phẩm Mới</h4>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label for="nameEx7" class="form-label">Tên Danh Mục</label>
+                                <input name="name" onkeyup="ChangeToSlug()" id="namecate" class="form-control" placeholder="Nhập Tên Danh Mục Muốn Thêm" type="text" value="" tabindex="0" id="nameEx7">
+                            </div>
+                            <div class="mb-3">
+                                <label for="nameEx7" class="form-label">Đường Dẫn Danh Mục</label>
+                                <input name="slug" id="slug" class="form-control" placeholder="Nhập Đường Dẫn Danh Mục Muốn Thêm" type="text" value="" tabindex="0" id="nameEx7">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button onclick="addCate()" type="button" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('imagelibrary', { allImage: allImage, imgSelected:false, type: 'radio'}) %>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.ckeditor.com/4.19.0/standard/ckeditor.js"></script>
+<script src="/assets/vendor/libs/izitoast/iziToast.min.js"></script>
+<script>
+    CKEDITOR.replace('editor1', {
+        width: '100%'
+    });
+    
+
+    let cate = [];
+    function addCategory(slug ,name){
+        if(cate.indexOf(name) == -1){
+            $('.content').append('<li>'+name+'<input name="cate[]" readonly style="display:none; width:'+name.length+'em ;cursor: none; background-color: #696cff; color: #fff; border: none;" type="text" value="'+slug+'"><i class="uit uit-multiply" onclick="removeTag(`'+name+'`,this)">x</i></li>');
+            cate.push(name);
+        }
+    } 
+    function removeTag(name, ele){
+        let index = cate.indexOf(name);
+        cate.splice(index,1);
+        ele.parentElement.remove();
+    }
+
+    $("#frm").submit(function(e) {
+        e.preventDefault(); 
+        var form = $(this);
+        var actionUrl = form.attr('action');
+        $.ajax({
+            type: "POST",
+            url: actionUrl,
+            data: form.serialize(),
+            dataType: 'json',
+            success: function(data){
+                console.log(data);
+                if(data.status == 'success'){
+                    iziToast.success({
+                        message: data.info,
+                        position: 'topCenter'
+                    });
+                } else {
+                    iziToast.error({
+                        message: data.info,
+                        position: 'topCenter'
+                    })
+                }
+            },
+            error: function(error){
+            }
+        });
+
+    });
+</script>

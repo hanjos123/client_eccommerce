@@ -1,0 +1,116 @@
+<div class="content-wrapper">
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4">
+            <span class="text-muted fw-light">Trang đơn /</span> Danh Sách
+        </h4>
+        <div class="card">
+            <div class="card-datatable table-responsive">
+                <div id="DataTables_Product_wrapper" class="dataTables_wrapper dt-bootstrap5">
+                    <div class="row ms-2 me-3">
+                        <div
+                            class="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-2">
+                            <div
+                                class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start mt-md-0 mt-3">
+                                <div class="dt-buttons">
+                                    <a href="/admin/pages/create" class="create-new btn btn-primary">
+                                        <i class="bx bx-plus me-sm-2"></i>Thêm trang đơn mới
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-2">
+                            <div class="dataTables_filter">
+                                <input onkeyup="findCate(this)" type="search" class="form-control"
+                                    placeholder="Tìm kiếm...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="datatables-basic table border-top dataTable no-footer dtr-column" id="listcategory"
+                role="grid" aria-describedby="DataTables_Product_info" style="width: 1209px;">
+                <thead>
+                    <tr role="row">
+                        <th style="width: 35%">Tên trang đơn</th>
+                        <th style="width: 30%;">Đường dẫn</th>
+                        <th style="width: 5%;">Hiển Thị</th>
+                        <th style="width: 10%;">Chức năng</th>
+                    </tr>
+                </thead>
+                <tbody id="list">
+                    <% pages.forEach(function(page){ %>
+                        <tr>
+                            <td><%= page.pTitle %></td>
+                            <td><%= page.pSlug %></td>
+                            <td>
+                                <div class="col-3 text-end">
+                                    <label class="switch me-0">
+                                        <input onclick="status('<%= page._id %>',this)" type="checkbox"
+                                            class="switch-input" <% if(page.Status){ %> checked <% } %>>
+                                            <span class="switch-toggle-slider">
+                                                <span class="switch-on">
+                                                    <i class="bx bx-check"></i>
+                                                </span>
+                                                <span class="switch-off">
+                                                    <i class="bx bx-x"></i>
+                                                </span>
+                                            </span>
+                                            <span class="switch-label"></span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                        <a href="/pages/<%= page.pSlug %>" target="_blank"
+                                            class="btn-List text-body" aria-label="Preview Invoice">
+                                            <i class="bx bx-show mx-1"></i>
+                                        </a>
+                                            <div class="dropdown">
+                                                <a href="javascript:;"
+                                                    class="btn dropdown-toggle hide-arrow text-body p-0"
+                                                    data-bs-toggle="dropdown"><i
+                                                        class="bx bx-dots-vertical-rounded"></i></a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <a href="/admin/pages/edit/<%= page._id %>" class="dropdown-item">Chỉnh sửa</a>
+                                                    <button onclick="deletePage('<%=page._id%>')" class="dropdown-item delete-record text-danger">Xóa</button>
+                                                </div>
+                                            </div>
+                                </div>
+                            </td>
+
+                        </tr>
+                    <% }) %>
+                    <tr>
+                        
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function deletePage(id){
+        $.ajax({
+            async: true,
+            url: "<%= process.env.DOMAIN_API %>/deletepages/" + id,
+            type: 'GET',
+            contentType: "application/x-www-form-urlencoded",
+            dataType: "json",
+            success: function (res) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Xóa thành công',
+                    showConfirmButton: false,
+                    timer: 1000
+                })
+                window.reload();
+            },
+            error: function (xhr) {
+                // alert(id);
+                console.log(xhr.responseText);
+            },
+        });
+    }
+</script>

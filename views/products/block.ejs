@@ -1,0 +1,16 @@
+<% if(products.length > 0){ %>
+	<section class="products section bg-gray">
+		<div class="container">
+			<div class="row">
+				<div class="title text-center">
+					<h2><%= title %></h2>
+				</div>
+			</div>
+			<div class="row">
+				<% products.forEach(function(product){ %>
+					<%- include('products', {'product': product}) %>
+				<% }) %>
+			</div>
+		</div>
+	</section>
+<% } %>

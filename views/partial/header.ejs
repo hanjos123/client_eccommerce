@@ -1,0 +1,134 @@
+<!-- Start Top Header Bar -->
+<section class="top-header">
+    <div class="container">
+        
+        <div class="row">
+            <div class="col-md-4 col-xs-12 col-sm-4">
+                <div class="contact-number">
+                    <i class="tf-ion-ios-telephone"></i>
+                    <span>078.7837.485</span>
+                </div>
+            </div>
+            <div class="col-md-4 col-xs-12 col-sm-4">
+                <!-- Site Logo -->
+                <div class="logo text-center">
+                    <a href="/">
+                        <!-- replace logo here -->
+                        <img style="height: 50px;" src="/images/logo.png" alt="LEVENTS" class="img-responsive logoimg">
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4 col-xs-12 col-sm-4">
+                <!-- Cart -->
+                <ul class="top-menu text-right list-inline">
+                    <li id="cart-content" class="dropdown cart-nav dropdown-slide">
+                        <a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"><i
+                                class="tf-ion-android-cart"></i>Giỏ
+                            Hàng</a>
+                        <div class="dropdown-menu cart-dropdown">
+
+                            <!-- Cart Item -->
+                            <% let sum=0; console.log(products.length); if(products.length> 0){
+                                products.forEach(function(pro, i){ %>
+                                <div class="media">
+                                    <a class="pull-left" href="/products">
+                                        <img class="media-object" src="<%= process.env.DOMAIN_SERVER %>/uploads/<%= pro.Product_image[0] %>" alt="image">
+                                    </a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><a href="/products/<%= pro.Product_slug %>">
+                                                <%= pro.Product_name %>
+                                            </a></h4>
+                                        <div class="cart-price">
+                                            <span>Size: <%= cart.Inventory[i].Size %>
+                                                    <br>
+                                            </span>
+                                            <span>
+                                                <%= cart.Inventory[i].Quantity %> x
+                                            </span>
+                                            <span>
+                                                <% if(pro.Sale){ %>
+                                                    <% if(new Date(pro.Sale.start) < Date.now() && Date.now() < new Date(pro.Sale.end)){ %>
+                                                        <%= Intl.NumberFormat().format(pro.PriceDiscount) %>₫
+                                                    <% } %>
+                                                <% } else { %>
+                                                    <%= Intl.NumberFormat().format(pro.Price) %>₫
+                                                <% } %>
+                                            </span>
+                                        </div>
+                                        <h5><strong>
+                                                <% if(pro.Sale){ %>
+                                                    <% if(new Date(pro.Sale.start) < Date.now() && Date.now() < new Date(pro.Sale.end)){ %>
+                                                        <%= Intl.NumberFormat().format(cart.Inventory[i].Quantity * pro.PriceDiscount) %>₫
+                                                    <% } %>
+                                                <% } else { %>
+                                                    <%= Intl.NumberFormat().format(cart.Inventory[i].Quantity * pro.Price) %>₫
+                                                <% } %>
+                                                
+                                            </strong></h5>
+                                    </div>
+                                    <a href="javascript:(0)" onclick="deleteOneCart('<%= cart.Inventory[i]._id %>')"
+                                        class="remove"><i class="tf-ion-close"></i></a>
+                                </div>
+                                <% if(pro.Sale){
+                                        if(new Date(pro.Sale.start) < Date.now() && Date.now() < new Date(pro.Sale.end)){
+                                            sum += cart.Inventory[i].Quantity * pro.PriceDiscount;
+                                        }
+                                    } else { 
+                                        sum += cart.Inventory[i].Quantity * pro.Price
+                                    }
+                                })%>
+                                    <% if(products !=null){ %>
+                                        <div class="cart-summary">
+                                            <span>Tổng:</span>
+                                            <span class="total-price">
+                                                <%= Intl.NumberFormat().format(sum) %>₫
+                                            </span>
+                                        </div>
+                                        <ul class="text-center cart-buttons">
+                                            <li><a href="/cart" class="button dark">Xem giỏ hàng</a></li>
+                                            <li><a href="/checkout" class="button dark">Thanh toán</a>
+                                            </li>
+                                        </ul>
+                                        <% }} else { %>
+                                            <h4 style="text-align: center;">Chưa có sản phẩm được thêm</h4>
+                                            <% } %>
+                        </div>
+                    </li>
+
+                    <!-- Search -->
+                    <li class="dropdown search dropdown-slide">
+                        <a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"><i
+                                class="tf-ion-ios-search-strong"></i> Tìm kiếm</a>
+                        <ul class="dropdown-menu search-dropdown">
+                            <li>
+                                <form action="/products/find" method="post">
+                                    <input type="search" name="str" class="form-control search-box" placeholder="Tìm kiếm...">
+                                </form>
+                            </li>
+                        </ul>
+                    </li><!-- / Search -->
+
+                    <!-- Languages -->
+                    <li class="dropdown dropdown-slide">
+                        <a href="#!" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+                            data-delay="350" role="button" aria-haspopup="true" aria-expanded="false">Tài Khoản<span
+                                class="tf-ion-ios-arrow-down"></span></a>
+                        <ul class="dropdown-menu">
+                            <% if(info){ %>
+                                <li><a href="/account">
+                                        <%= info.name %>
+                                    </a></li>
+                                <li><a href="/account/logout?from=<%= url %>">Đăng Xuất</a></li>
+                                <% } else {%>
+                                    <li><a href="/account/login?from=<%= url %>">Đăng Nhập</a></li>
+                                    <li><a href="/account/register">Đăng Ký</a></li>
+                                    <li><a href="/account/changepassword">Quên Mật Khẩu</a></li>
+                                    <% } %>
+                        </ul>
+                    </li><!-- / Blog -->
+
+                </ul><!-- / .nav .navbar-nav .navbar-right -->
+            </div>
+        </div>
+    </div>
+</section><!-- End Top Header Bar -->

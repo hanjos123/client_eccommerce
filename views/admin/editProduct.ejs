@@ -1,0 +1,407 @@
+
+<link rel="stylesheet" href="/assets/css/flatpickr.css">
+
+<link rel="stylesheet" href="/code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <form id="formEditProduct" action="<%= process.env.DOMAIN_API %>/editproduct/<%= product._id%>" method="post">
+        <h4 class="fw-bold py-3 mb-4">
+            <span class="text-muted fw-light">Sản phẩm /</span> Chỉnh sửa
+        </h4>
+
+
+        <div class="row invoice-add">
+            <!-- Invoice Add-->
+            <div class="col-lg-6 col-12 mb-lg-0 mb-4">
+                <div class="card invoice-preview-card">
+                    <div class="card-body">
+                        <div class="row p-sm-3 p-0">
+                            <div class="mb-3">
+                                <label class="form-label" for="pro_name">Tên sản phẩm <span
+                                        class="text-danger">(*)</span></label>
+                                <input name="pro_name" onkeyup="ChangeToSlugProduct(this)"
+                                    value="<%= product.Product_name %>" type="text" class="form-control" id="pro_name"
+                                    placeholder="Nhập tên sản phẩm">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="basic-default-fullname">Đường dẫn sản phẩm <span
+                                        class="text-danger">(*)</span></label>
+                                <input id="pro_slug" name="pro_slug" value="<%= product.Product_slug %>" type="text"
+                                    class="form-control" id="basic-default-fullname"
+                                    placeholder="Nhập đường dẫn sản phẩm">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="basic-default-fullname">Size sản phẩm <span
+                                        class="text-danger">(*)</span></label>
+                                <div id="size-group" class="input-group">
+                                    <input type="text" class="mb-3 form-control" placeholder="Nhập tên size muốn thêm">
+                                    <button onclick="addsize(this)" class="mb-3 btn btn-outline-primary" type="button"
+                                        id="button-addon2">Thêm</button>
+                                    <% product.Size.forEach(function(size, i){ %>
+                                        <div class="input-group">
+                                            <div id="<%= size.Name_size %>" class="input-group">
+                                                <input style="width:100px;" class="btn btn-outline-primary" readonly=""
+                                                    name="size[]" type="text" value="<%= size.Name_size %>">
+                                                <input name="quantity[]" required type="number"
+                                                    value="<%= size.Quantity %>" class="form-control"
+                                                    placeholder="Nhập số lượng sản phẩm của size <%= size.Name_size %>">
+                                                <button onclick="remove(this)" class="btn btn-outline-primary"
+                                                    type="button" id="button-addon2">✖</button>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="basic-default-fullname">Mô tả sản phẩm <span
+                                        class="text-danger">(*)</span></label>
+                                <div id="size-group" class="input-group">
+                                    <textarea name="editor1" id="editor1" style="width: 100%">
+                                    <%- product.Product_detail %>
+                                </textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /Invoice Add-->
+
+            <!-- Invoice Actions -->
+            <div class="col-lg-6 col-12 invoice-actions">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-6 col-sm-6">
+                                <p>Giá Sản Phẩm <span class="text-danger">(*)</span></p>
+                                <input name="price" value="<%= product.Price %>" type="number" required
+                                    class="form-control invoice-item-price mb-2" placeholder="000">
+                            </div>
+                            <div class="col-lg-6 col-sm-6">
+                                <p>Giá Sản Phẩm Khi Giảm Giá<span class="text-danger">(*)</span></p>
+                                <input name="priceSale" value="<%= product.PriceDiscount %>" type="number" required
+                                    class="form-control invoice-item-price mb-2" placeholder="000">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-lg-6 col-sm-6">
+                                <p>Thời gian bắt đầu giảm giá</p>
+                                <input <% if(product.Sale){ %> value="<%= product.Sale.start %>" <% } %> id="startSale"
+                                        type="text" class="form-control flatpickr-input" name="startSale"
+                                        placeholder="Bắt đầu lúc" readonly="readonly">
+                            </div>
+                            <div class="col-lg-6 col-sm-6">
+                                <p>Thời gian kết thúc giảm giá</p>
+                                <input <% if(product.Sale){ %> value="<%= product.Sale.end %>" <% } %> id="endSale"
+                                        type="text" class="form-control flatpickr-input" name="endSale" placeholder="Kết
+                                        thúc lúc" readonly="readonly">
+                            </div>
+                        </div>
+
+                        <p class="mb-2">Danh mục sản phẩm <span class="text-danger">(*)</span></p>
+                        <% category.cateParent0.forEach(function(cate){ %>
+                            <% category.cateParentId.forEach(function(cate1){ %>
+                                <% if(cate.cUrl=='collections' && cate1.cParentId==cate._id && cate1.cUrl !='' ){ %>
+                                    <button type="button"
+                                        onclick="addCategory('<%= cate1.cUrl %>','<%= cate1.cName %>')"
+                                        class="btn btn-primary mb-1">
+                                        <%= cate1.cName %>
+                                    </button>
+                                    <% } %>
+                                        <% }) %>
+                                            <% }) %>
+                                                <button id="btnAddCate" type="button" class="btn btn-primary mb-1"
+                                                    data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                                                    Thêm Danh Mục Mới
+                                                </button>
+                                                <ul class="content">
+                                                    <% category.cateParentId.forEach(function(cate){
+                                                        product.Category_slug.forEach(function(pro, i){
+                                                        if(pro==cate.cUrl){%>
+                                                        <li>
+                                                            <%= pro %>
+                                                                <input name="cate[]" readonly=""
+                                                                    style="display:none; width:2em ;cursor: none; background-color: #696cff; color: #fff; border: none;"
+                                                                    type="text" value="<%= pro %>">
+                                                                <i class="uit uit-multiply"
+                                                                    onclick="removeTag(`<%= pro %>`,this)">x</i>
+                                                        </li>
+                                                        <%} }) }) %>
+                                                </ul>
+
+                                                <p class="mb-2">Hình ảnh sản phẩm <span class="text-danger">(*)</span>
+                                                </p>
+                                                <button type="button" class="mb-3 col-sm-12 btn btn-outline-primary"
+                                                    data-bs-toggle="modal" data-bs-target="#imageLibrary">Chọn</button>
+                                                <div class="row" id="sortable-cards">
+                                                    <% product.Product_image.forEach(img=>{ %>
+                                                        <div data-position="0" class="col-sm-4 border p-2 position-relative cursor-move">
+                                                            <img width="100%"
+                                                                src="<%= process.env.DOMAIN_SERVER %>/uploads/<%= img %>" alt="">
+                                                            <input name="image" type="text" value="<%= img %>"
+                                                                class="d-none">
+                                                            <button type="button" onclick="removeImageDetail(this)"
+                                                                class="position-absolute top-0 end-0 btn-close"
+                                                                aria-label="Close"></button>
+                                                        </div>
+                                                        <% }) %>
+                                                </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <button type="submit" class="btn btn-primary d-grid w-100 mb-3">Lưu</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content text-center">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body onboarding-horizontal p-0">
+                <div class="onboarding-content mb-0">
+                    <h4 class="onboarding-title text-body">Thêm Danh Mục Sản Phẩm Mới</h4>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="mb-3">
+                                <label for="nameEx7" class="form-label">Tên Danh Mục</label>
+                                <input name="name" onkeyup="ChangeToSlug()" id="namecate" class="form-control"
+                                    placeholder="Nhập Tên Danh Mục Muốn Thêm" type="text" value="" tabindex="0"
+                                    id="nameEx7">
+                            </div>
+                            <div class="mb-3">
+                                <label for="nameEx7" class="form-label">Đường Dẫn Danh Mục</label>
+                                <input name="slug" id="slug" class="form-control"
+                                    placeholder="Nhập Đường Dẫn Danh Mục Muốn Thêm" type="text" value="" tabindex="0"
+                                    id="nameEx7">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button onclick="addCate()" type="button" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('imagelibrary', { allImage: allImage, imgSelected: product.Product_image, type: 'checkbox' }) %>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <script src="/assets/vendor/libs/jquery/jquery.js"></script>
+    <script src="/assets/vendor/libs/sortablejs/sortable.js"></script>
+    <script src="/assets/js/form-validation.js"></script>
+    <script src="/assets/vendor/libs/ckeditor/ckeditor.js"></script>
+    <script>
+        flatpickr("#startSale, #endSale", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+        });
+        function ChangeToSlug() {
+            var title, slug;
+
+            //Lấy text từ thẻ input title 
+            title = document.getElementById("namecate").value;
+
+            //Đổi chữ hoa thành chữ thường
+            slug = title.toLowerCase();
+
+            //Đổi ký tự có dấu thành không dấu
+            slug = slug.replace(/á|à|ả|ạ|ã|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/gi, 'a');
+            slug = slug.replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/gi, 'e');
+            slug = slug.replace(/i|í|ì|ỉ|ĩ|ị/gi, 'i');
+            slug = slug.replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/gi, 'o');
+            slug = slug.replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/gi, 'u');
+            slug = slug.replace(/ý|ỳ|ỷ|ỹ|ỵ/gi, 'y');
+            slug = slug.replace(/đ/gi, 'd');
+            //Xóa các ký tự đặt biệt
+            slug = slug.replace(/\`|\~|\!|\@|\#|\||\$|\%|\^|\&|\*|\(|\)|\+|\=|\,|\.|\/|\?|\>|\<|\'|\"|\:|\;|_/gi, '');
+            //Đổi khoảng trắng thành ký tự gạch ngang
+            slug = slug.replace(/ /gi, "-");
+            //Đổi nhiều ký tự gạch ngang liên tiếp thành 1 ký tự gạch ngang
+            //Phòng trường hợp người nhập vào quá nhiều ký tự trắng
+            slug = slug.replace(/\-\-\-\-\-/gi, '-');
+            slug = slug.replace(/\-\-\-\-/gi, '-');
+            slug = slug.replace(/\-\-\-/gi, '-');
+            slug = slug.replace(/\-\-/gi, '-');
+            //Xóa các ký tự gạch ngang ở đầu và cuối
+            slug = '@' + slug + '@';
+            slug = slug.replace(/\@\-|\-\@|\@/gi, '');
+            //In slug ra textbox có id “slug”
+            document.getElementById('slug').value = slug;
+        }
+
+        function uploadProduct() {
+            var formData = new FormData(document.getElementById('frm'));
+            console.log(formData.get('imagedetail'));
+        }
+
+        let sizearr = [];
+        function addsize($this) {
+            var val = $this.previousElementSibling.value;
+            if (val == '') {
+                console.log('no input');
+            } else if (sizearr.findIndex((obj => obj.Name_size == val)) == -1) {
+                $('#size-group').append('<div class="input-group">' +
+                    '<div id="' + val + '" class="input-group">' +
+                    '<input style="width:100px;" class="btn btn-outline-primary" readonly name="size[]" type="text" value="' + val + '">' +
+                    '<input required name="quantity[]" type="number" class="form-control" placeholder="Nhập số lượng sản phẩm của size ' + val + '">' +
+                    '<button onclick="remove(this)" class="btn btn-outline-primary" type="button" id="button-addon2">✖</button></div>');
+                sizearr.push({ Name_size: val, Quantity: 0 });
+            }
+            $this.previousElementSibling.value = '';
+        }
+
+        function remove(ele) {
+            ele.parentElement.remove();
+        }
+
+        let cate = [];
+        function addCategory(slug, name) {
+            if (cate.indexOf(name) == -1) {
+                $('.content').append('<li>' + name + '<input name="cate[]" readonly style="display:none; width:' + name.length + 'em ;cursor: none; background-color: #696cff; color: #fff; border: none;" type="text" value="' + slug + '"><i class="uit uit-multiply" onclick="removeTag(`' + name + '`,this)">x</i></li>');
+                cate.push(name);
+            }
+        }
+
+        function removeTag(name, ele) {
+            let index = cate.indexOf(name);
+            cate.splice(index, 1);
+            ele.parentElement.remove();
+        }
+
+        function addCate() {
+            JsLoadingOverlay.show(configs);
+            let name = $('#namecate').val();
+            let url = $('#slug').val();
+            $.ajax({
+                url: "/admin/category/createfromproduct",
+                type: 'post',
+                contentType: "application/x-www-form-urlencoded",
+                dataType: "json",
+                data: { name: name, cUrl: url },
+                success: function (res) {
+                    console.log(res);
+                    $('#btnAddCate').before('<button onclick="addCategory(`' + res.cUrl + '`,`' + res.cName + '`)" type="button" class="btn btn-outline-secondary">' + res.cName + '</button>');
+                    $('#addCategoryModal').hide();
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open');
+                    $("body").removeAttr("style");
+                    JsLoadingOverlay.hide();
+                }
+            });
+        }
+        $("#imagedetail").change(function () {
+            var $fileUpload = $("# imagedetail");
+            if (parseInt($fileUpload.get(0).files.length) > 5) {
+                alert('Chỉ được upload tối đa 5 hình');
+                $('#imagedetail').val('');
+            }
+        });
+
+        $("#formEditProduct").submit(function (e) {
+            e.preventDefault();
+                var form = $(this);
+                var actionUrl = form.attr('action');
+
+            $.ajax({
+                type: "POST",
+                url: actionUrl,
+                data: form.serialize(),
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data.info);
+                    if (data.status == 'error') {
+                        Swal.fire({
+                            title: "Oops...",
+                            text: data.info.message,
+                            icon: "error",
+                            timer: 1000
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: data.info.message,
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                    }
+                },
+                error: function (error) {
+                    console.log('lỗi');
+                }
+            });
+
+        });
+
+        $(document).ready(function () {
+            $( "#sortable-cards" ).sortable();
+        });
+
+        var el = document.getElementById('sortable-cards');
+        var sortable = Sortable.create(el);
+
+        
+
+
+        function ChangeToSlugProduct(ele) {
+            var title, slug;
+
+            //Lấy text từ thẻ input title 
+            title = $(ele).val();
+
+            //Đổi chữ hoa thành chữ thường
+            slug = title.toLowerCase();
+
+            //Đổi ký tự có dấu thành không dấu
+            slug = slug.replace(/á|à|ả|ạ|ã|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/gi, 'a');
+            slug = slug.replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/gi, 'e');
+            slug = slug.replace(/i|í|ì|ỉ|ĩ|ị/gi, 'i');
+            slug = slug.replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/gi, 'o');
+            slug = slug.replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/gi, 'u');
+            slug = slug.replace(/ý|ỳ|ỷ|ỹ|ỵ/gi, 'y');
+            slug = slug.replace(/đ/gi, 'd');
+            //Xóa các ký tự đặt biệt
+            slug = slug.replace(/\`|\~|\!|\@|\#|\||\$|\%|\^|\&|\*|\(|\)|\+|\=|\,|\.|\/|\?|\>|\<|\'|\"|\:|\;|_/gi, '');
+            //Đổi khoảng trắng thành ký tự gạch ngang
+            slug = slug.replace(/ /gi, "-");
+            slug = slug.replace(/[^-a-zа-я\u0370-\u03ff\u1f00-\u1fff]+/g, '')
+            //Đổi nhiều ký tự gạch ngang liên tiếp thành 1 ký tự gạch ngang
+            //Phòng trường hợp người nhập vào quá nhiều ký tự trắng
+            slug = slug.replace(/\-\-\-\-\-/gi, '-');
+            slug = slug.replace(/\-\-\-\-/gi, '-');
+            slug = slug.replace(/\-\-\-/gi, '-');
+            slug = slug.replace(/\-\-/gi, '-');
+            //Xóa các ký tự gạch ngang ở đầu và cuối
+            slug = '@' + slug + '@';
+            slug = slug.replace(/\@\-|\-\@|\@/gi, '');
+            //In slug ra textbox có id “slug”
+            document.getElementById('pro_slug').value = slug;
+        }
+        editor = CKEDITOR.replace('editor1'); // bind editor
+
+        editor.addCommand("mySimpleCommand", { // create named command
+            exec: function() {
+                $('#imageLibrary').modal('show');
+            }
+        });
+
+        editor.ui.addButton('SuperButton', { // add new button and bind our command
+            label: "Click me",
+            command: 'mySimpleCommand',
+            toolbar: 'insert',
+            icon: 'https://avatars1.githubusercontent.com/u/5500999?v=2&s=16'
+        });
+    </script>

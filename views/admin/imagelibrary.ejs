@@ -1,0 +1,169 @@
+<div class="modal fade" id="imageLibrary" tabindex="-1" aria-modal="true" role="dialog" style="display: none;">
+    <div class="modal-dialog modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFullTitle">Thư viện ảnh</h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <hr>
+            <div class="modal-body">
+                <div class="row" id="listImage">
+                    <% allImage.forEach(function(img){ %>
+                        <label for="<%=img._id%>"
+                            class="lbRadio position-relative border col-sm-6 col-md-4 col-lg-2 item text-center">
+                            <input type="<%= type %>" <% if(Array.isArray(imgSelected)){ %>
+                            <% if(imgSelected){imgSelected.forEach(function(check){ if(check==img.iFileName){%>
+                                checked
+                                <% }})}} else { %>
+                                    <% if(imgSelected.nAvatar==img.iFileName){ %>
+                                        checked
+                                        <% } %>
+                                            <% } %>
+                                                id="<%=img._id%>" name="imageAvatar" value="<%= img.iFileName %>">
+
+                                                        <img style="width: auto; max-height: 250px;" class="img-fluid"
+                                                            src="<%= process.env.DOMAIN_SERVER %>/uploads/<%= img.iFileName %>">
+                                                        <button type="button" onclick="deleteImage('<%=img._id%>')"
+                                                            class="position-absolute top-0 end-0 btn-close"
+                                                            aria-label="Close"></button>
+                        </label>
+                        <% }) %>
+                            <div id="divUploadImage"
+                                class="position-relative border col-sm-6 col-md-4 col-lg-2 item text-center">
+                                <form id="frm" enctype="multipart/form-data"
+                                    style="height: 200px; width: 200px; text-align: center;"
+                                    action="<%= process.env.DOMAIN_API %>/uploadimage" method="post">
+
+                                    <label style="width: 100%; height: 100%" for="uploadImage">Upload Image
+                                        <input id="uploadImage" onchange="upload()" multiple name="image" type="file">
+                                    </label>
+
+                                </form>
+                            </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Đóng
+                </button>
+                <button id="btnSetImage" type="button" onclick="setImage()" class="btn btn-primary"
+                    data-bs-dismiss="modal">Chọn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function upload() {
+        JsLoadingOverlay.show(configs);
+        var formData = new FormData();
+        for (let i = 0; i < $('#uploadImage')[0].files.length; i++) {
+            var attachment_data = $('#uploadImage')[0].files[i];
+            formData.append('image', attachment_data);
+        }
+        $.ajax({
+            async: true,
+            type: 'POST',
+            url: '<%= process.env.DOMAIN_API %>/uploadimage',
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: 'json',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (res) {
+                console.log(res)
+                beforeImage(res);
+                // $('#uploadImage').val('');
+                JsLoadingOverlay.hide();
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+    function beforeImage(res) {
+        var html = '';
+        res.Images.forEach(function (img) {
+            html += `<label for="${img._id}" class="lbRadio position-relative border col-sm-6 col-md-4 col-lg-2 item text-center">
+        <input type="checkbox" id="${img._id}" name="${myNameImage}" value="${img.iFileName}">
+        <img style="width: auto; max-height: 250px;" class="img-fluid"
+            src="<%= process.env.DOMAIN_SERVER %>/uploads/${img.iFileName}">
+        <button type="button" onclick="deleteImage('${img._id}')"
+            class="position-absolute top-0 end-0 btn-close" aria-label="Close"></button>
+    </label>`;
+        })
+        html += `<div id="divUploadImage" class="position-relative border col-sm-6 col-md-4 col-lg-2 item text-center">
+    <form id="frm" enctype="multipart/form-data"
+        style="height: 200px; width: 200px; text-align: center;"
+        action="<%= process.env.DOMAIN_API %>/uploadimage" method="post">
+
+        <label style="width: 100%; height: 100%" for="uploadImage">Upload Image
+            <input id="uploadImage" onchange="upload()" multiple  name="image" type="file">
+        </label>
+
+    </form>
+</div>`;
+
+        $('#listImage').replaceWith(html);
+    }
+    function deleteImage(id) {
+    JsLoadingOverlay.show(configs);
+    $.ajax({
+        async: true,
+        type: 'GET',
+        url: '<%= process.env.DOMAIN_API %>/deleteimage/' + id,
+        contentType: 'application/x-www-form-urlencoded',
+        dataType: 'json',
+        success: function (res) {
+            updateListImage(res);
+            JsLoadingOverlay.hide();
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+        }
+    });
+}
+function updateListImage(res) {
+    let html = `<div class="row" id="listImage">`;
+    res.Images.forEach(function (img) {
+        html += `<div class="position-relative border col-sm-6 col-md-4 col-lg-2 item text-center">
+            <input type="checkbox" id="${img._id}" name="imageAvatar" value="${img.iFileName}">
+            <img style="width: auto; max-height: 250px;" class="img-fluid"
+                src="<%= process.env.DOMAIN_SERVER %>/uploads/${img.iFileName}">
+            <button type="button" onclick="deleteImage('${img._id}')"
+                class="position-absolute top-0 end-0 btn-close" aria-label="Close"></button>
+        </div>`;
+    });
+    html += `<div class="position-relative border col-sm-6 col-md-4 col-lg-2 item text-center">
+                <form id="frm" enctype="multipart/form-data"
+                    style="height: 200px; width: 200px; text-align: center;"
+                    action="<%= process.env.DOMAIN_API %>/uploadimage" method="post">
+
+                    <label style="width: 100%; height: 100%" for="uploadImage">Upload Image
+                        <input id="uploadImage" onchange="upload()" name="image" type="file">
+                    </label>
+
+                </form>
+            </div>
+</div>`;
+    $('#listImage').replaceWith(html);
+}
+
+function setImage(){
+    $('#sortable-cards').html("");
+    let selected = [];
+    $("input[type=checkbox]:checked").each(function () {
+        selected.push(this.value);
+    });
+    selected.forEach(function(img){
+        var html = `
+        <div class="col-sm-4 border p-2 position-relative cursor-move">
+            <input name="image" type="text" value="${img}" class="d-none">
+            <img width="100%" src="<%= process.env.DOMAIN_SERVER %>/uploads/${img}" alt="">
+            <button type="button" onclick="removeImageDetail(this)" class="position-absolute top-0 end-0 btn-close" aria-label="Close"></button>
+        </div>`;
+        $('#sortable-cards').append(html);
+    })
+}
+</script>

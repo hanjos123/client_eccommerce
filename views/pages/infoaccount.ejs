@@ -1,0 +1,111 @@
+<style>
+    .form-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.form-control-placeholder {
+  position: absolute;
+  top: 0;
+  margin: 0px;
+  padding: 0 5px;
+  transition: all 200ms;
+}
+
+.form-control:focus + .form-control-placeholder,
+.form-control:valid + .form-control-placeholder {
+  font-size: 75%;
+  transform: translate3d(0, -105%, 0);
+  color: #000;
+  background: #fff;
+}
+</style>
+
+<section class="page-header">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="content">
+					<h1 class="page-name">Dashboard</h1>
+					<ol class="breadcrumb">
+						<li><a href="/">Trang Chủ</a></li>
+						<li class="active">Tài Khoản Của Tôi</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+<div class="page-wrapper">
+    <div class="checkout shopping">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6" style="float: none; margin:auto;">
+                    <div class="block billing-details">
+                        <h4 class="widget-title">Thông tin tài khoản</h4>
+                        <form class="checkout-form" action="<%= process.env.DOMAIN_API %>/editaccount/<%= user._id %>" id="checkout" method="post">
+                            <div class="row">
+                                <div class="col-lg-12 form-group">
+                                    <input value="<%= user.Name %>" type="text" class="form-control" required id="name" name="name" placeholder="">
+                                    <label class="form-control-placeholder" for="name">Họ tên</label>
+                                </div>
+                                <div class="col-lg-12 form-group">
+                                    <input value="<%= user.Address %>" type="text" class="form-control" required name="address" placeholder="">
+                                    <label class="form-control-placeholder" for="user_address">Địa chỉ nhận hàng</label>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <input value="<%= user.Phone %>" type="text" class="form-control" required name="numberphone"
+                                    value="">
+                                    <label class="form-control-placeholder" for="numberphone">Số điện thoại</label>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <input value="<%= user.Email %>" type="email" class="form-control" required name="email"
+                                    name="city" value="">
+                                    <label class="form-control-placeholder" for="email">Email</label>
+                                </div>
+                            <button type="submit" style="margin-left: 40%;" class="button dark mt-20">Cập nhật</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="<%= process.env.DOMAIN_NAME %>/assets/vendor/libs/jquery/jquery.js"></script>
+<script>
+    $("#formeditaccount").submit(function (e) {
+        e.preventDefault();
+        var form = $(this);
+        var actionUrl = form.attr('action');
+
+        $.ajax({
+            type: "POST",
+            url: actionUrl,
+            data: form.serialize(),
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                if (data.status == 'error') {
+                    Swal.fire({
+                        title: "Oops...",
+                        text: data.info.message,
+                        icon: "error",
+                        timer: 1000
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: data.info.message,
+                        showConfirmButton: true
+                    })
+                }
+            },
+            error: function (error) {
+                console.log('lỗi');
+            }
+        });
+    });
+</script>
